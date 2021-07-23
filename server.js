@@ -7,6 +7,7 @@ app.set('view engine', 'ejs');
 require('dotenv').config();
 const WCL_TOKEN = (secrets.read('WCL_TOKEN') || process.env.WCL_TOKEN || '');
 const GUILD_ROSTER_LIMIT = (secrets.read('GUILD_ROSTER_LIMIT') || process.env.GUILD_ROSTER_LIMIT || '');
+const port=process.env.PORT || 3000;
 
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -109,6 +110,6 @@ app.post('/encounter-report', async function (req, res) {
 
 });
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
+app.listen(port, function () {
+    console.log(`Example app listening on port ${port}!`);
 });
