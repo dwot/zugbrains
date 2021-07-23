@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+</head>
+<body class="container">
+
+<header>
+    <%- include('../partials/header'); %>
+</header>
+
+<main>
+    <div class="container">
+        <form action="/encounter-report" method="post">
+            Guild Id: <input name="guildId" type="text" value="485317"/> <br />
+            Encounter Id: <select name="encounterId">
+                <% encounters.forEach(function(value, key) { %>
+                    <option value="<%=key %>"><%=value %></option>
+                <% }); %>
+
+            </select> <br />
+            <input type="submit" />
+        </form>
+    </div>
+</main>
+
+<footer>
+    <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>
