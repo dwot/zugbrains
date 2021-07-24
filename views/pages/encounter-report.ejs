@@ -37,6 +37,17 @@
             </div>
         </div>
 
+        <% if (failedChars.length > 0) {%>
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-danger" role="alert">The following characters could not be loaded and need to be Updated on Warcraft Logs:
+                    <% failedChars.forEach(function(value) { %>
+                               <%= value %>,
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+        <% } %>
         <div class="row">
             <div class="col">
 

@@ -39,13 +39,16 @@ CLASS_MAP.set(9,"Shaman")
 CLASS_MAP.set(10,"Warlock")
 CLASS_MAP.set(11,"Warrior")
 
+
+const US_SERVERS = ['atiesh','arugal','bloodsail-buccaneers','faerlina','fairbanks','grobbulus','herod','mankrik','myzrael','pagle','remulos','thalnos','whitemane','stalagg','blaumeux','skeram','incendius','bigglesworth','old-blanchy','westfall','kurinnaxx','kromcrush','deviate-delight','smolderweb','sulfuras','ashkandi','kirtonos','rattlegore','felstriker','yojamba','thunderfury','benediction','azuresong','windseeker','anathema','netherwind','earthfury','heartseeker','arcanite-reaper','loatheb','sulthraze']
+const EU_SERVERS = ['golemagg','hydraxian-waterlords','mirage-raceway','pyrewood-village','shazzrah','zandalar-tribe','auberdine','sulfuron','everlook','lucifron','chromie','flamegor','gehennas','firemaw','flamelash','gandling','mograine','nethergarde-keep','razorgore','stonespine','noggenfogger','amnennar','ashbringer','dreadmist','skullflame','ten-storms','dragons-call','lakeshire','transcendence','finkle','bloodfang','judgement','earthshaker','venoxis','wyrmthalak','rhokdelar','razorfen','patchwerk','heartstriker','mandokir','harbinger-of-doom','dragonfang','celebras']
 const staticVars = {};
 
-
+staticVars.getServersUs = function getServersUs() { return US_SERVERS }
+staticVars.getServersEu = function getServersEu() { return EU_SERVERS }
 staticVars.getZoneMap = function getZoneMap() {
     return ZONE_MAP
 }
-
 
 staticVars.getBossMap =  function getBossMap() {
     return ENCOUNTER_MAP

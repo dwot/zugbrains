@@ -12,7 +12,17 @@
 <main>
     <div class="container">
         <form action="/encounter-report" method="post">
-            Guild Id: <input name="guildId" type="text" value="485317"/> <br />
+
+            Guild Name: <input name="guildName" type="text"/> <br/>
+            Region: <input type="radio" id="regionUS" name="region" value="US">
+            <label for="regionUS">US</label>
+            <input type="radio" id="regionEU" name="region" value="EU" >
+            <label for="regionEU">EU</label>
+            <br/>
+            Server: <select name="server" id="server">
+                        <option>NOT LOADED</option>
+                    </select>
+            <br/>
             Encounter Id: <select name="encounterId">
                 <% encounters.forEach(function(value, key) { %>
                     <option value="<%=key %>"><%=value %></option>
@@ -23,7 +33,25 @@
         </form>
     </div>
 </main>
+<script>
 
+    $(document).ready(function(){
+        $('#regionUS').change(function(){
+            $('#server').empty();
+            <% usServers.forEach(function(value) { %>
+            $('#server').append($('<option>',{text: '<%= value %>', value: '<%= value %>'}))
+            <% }) %>
+            $('#server').change();
+        });
+        $('#regionEU').change(function(){
+            $('#server').empty();
+            <% euServers.forEach(function(value) { %>
+            $('#server').append($('<option>',{text: '<%= value %>', value: '<%= value %>'}))
+            <% }) %>
+            $('#server').change();
+        });
+    });
+</script>
 <footer>
     <%- include('../partials/footer'); %>
 </footer>
