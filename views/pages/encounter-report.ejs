@@ -36,8 +36,67 @@
 
             </div>
         </div>
+
         <div class="row">
             <div class="col">
+
+
+                <div>
+                    <div id="toolbar2" class="select">
+                        <select class="form-control">
+                            <option value="">Export Basic</option>
+                            <option value="all">Export All</option>
+                            <option value="selected">Export Selected</option>
+                        </select>
+                    </div>
+
+
+                        <table id="table2" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar2"
+                               data-show-toggle="true" data-show-columns="true"
+                               data-filter-control="true"  class="table table-bordered table-hover table-dark table-striped table-responsive ">
+
+                            <thead class="">
+                            <tr>
+                                <th style="" data-field="name" data-filter-control="input" data-sortable="true"><div class="th-inner ">Name</div>
+                                    </td>
+                                <th style="" data-field="class" data-filter-control="select" data-sortable="true"><div class="th-inner ">Class</div>
+                                    </td>
+                                <th style="" data-field="bossName"><div class="th-inner ">Boss</div>
+                                    </td>
+                                <th style="" data-field="kills" data-sortable="true"><div class="th-inner ">Kills</div>
+                                    </td>
+                                <th style="" data-field="bestRank" data-sortable="true"><div class="th-inner ">Best Rank</div>
+                                    </td>
+                                <th style="" data-field="avgRank" data-sortable="true"><div class="th-inner ">Avg Rank</div>
+                                    </td>
+                                <th style="" data-field="avgDps" data-sortable="true"><div class="th-inner ">Avg Dps</div>
+                                    </td>
+                                <th style="" data-field="avgDps5" data-sortable="true"><div class="th-inner ">Top 5 Avg</div>
+                                    </td>
+                                <th style="" data-field="avgDps3" data-sortable="true"><div class="th-inner ">Top 3 Avg</div>
+                                    </td>
+                                <th style="" data-field="bestDps" data-sortable="true"><div class="th-inner ">Best DPS</div>
+                                    </td>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col">
+
+                <p>
+                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                        Show Raw Data
+                    </button>
+                </p>
+
                 <div>
                     <div id="toolbar" class="select">
                         <select class="form-control">
@@ -46,37 +105,40 @@
                             <option value="selected">Export Selected</option>
                         </select>
                     </div>
+                <div class="collapse" id="collapseExample">
 
-                    <table id="table" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar"
-                           data-show-toggle="true" data-show-columns="true" class="table table-bordered table-hover table-dark table-striped table-responsive">
 
-                        <thead class="">
-                        <tr>
-                            <th style="" data-field="name"><div class="th-inner ">Name</div>
-                                <div class="fht-cell"></div></td>
-                            <th style="" data-field="bossName"><div class="th-inner ">Boss</div>
-                                <div class="fht-cell"></div></td>
-                            <th style="" data-field="guildName"><div class="th-inner ">Guild</div>
-                                <div class="fht-cell"></div></td>
-                            <th style="" data-field="date"><div class="th-inner ">Date</div>
-                                <div class="fht-cell"></div></td>
-                            <th style="" data-field="dps"><div class="th-inner ">DPS</div>
-                                <div class="fht-cell"></div></td>
-                            <th style="" data-field="duration"><div class="th-inner ">Duration</div>
-                                <div class="fht-cell"></div></td>
-                            <th style="" data-field="pct"><div class="th-inner ">HistRank</div>
-                                <div class="fht-cell"></div></td>
-                            <th style="" data-field="todayPct"><div class="th-inner ">TodayRank</div>
-                                <div class="fht-cell"></div></td>
-                            <th style="" data-field="class"><div class="th-inner ">Class</div>
-                                <div class="fht-cell"></div></td>
-                            <th style="" data-field="spec"><div class="th-inner ">Spec</div>
-                                <div class="fht-cell"></div></td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                        <table id="table" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar"
+                               data-show-toggle="true" data-show-columns="true" class="table table-bordered table-hover table-dark table-striped table-responsive">
+
+                            <thead class="">
+                            <tr>
+                                <th style="" data-field="name"><div class="th-inner ">Name</div>
+                                    </td>
+                                <th style="" data-field="bossName"><div class="th-inner ">Boss</div>
+                                    </td>
+                                <th style="" data-field="guildName"><div class="th-inner ">Guild</div>
+                                    </td>
+                                <th style="" data-field="date"><div class="th-inner ">Date</div>
+                                    </td>
+                                <th style="" data-field="dps"><div class="th-inner ">DPS</div>
+                                    </td>
+                                <th style="" data-field="duration"><div class="th-inner ">Duration</div>
+                                    </td>
+                                <th style="" data-field="pct"><div class="th-inner ">HistRank</div>
+                                    </td>
+                                <th style="" data-field="todayPct"><div class="th-inner ">TodayRank</div>
+                                    </td>
+                                <th style="" data-field="class"><div class="th-inner ">Class</div>
+                                    </td>
+                                <th style="" data-field="spec"><div class="th-inner ">Spec</div>
+                                    </td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -95,11 +157,25 @@
             }).trigger('change')
         })
 
+        var $table2 = $('#table2')
+
+        $(function () {
+            $('#toolbar2').find('select').change(function () {
+                $table2.bootstrapTable({
+                    exportDataType: $(this).val(),
+                    exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
+                    data: mydata2
+                })
+            }).trigger('change')
+        })
+
         var mydata = <%- JSON.stringify(reportData) %>
+        var mydata2 = <%- JSON.stringify(analyzedData) %>
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/extensions/export/bootstrap-table-export.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 
 
 </main>

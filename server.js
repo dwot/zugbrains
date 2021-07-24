@@ -74,11 +74,15 @@ app.post('/encounter-report', async function (req, res) {
     console.log('Total Guildies: ' + guildSet.size);
 
     let preparedData = [];
+    let analyzedData = [];
     let currentChar = 0
     for (let charName of guildSet) {
         if (currentChar < GUILD_ROSTER_LIMIT) {
             const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ')}}}'
             const data = await client.request(query)
+
+            let dpsRanks = [];
+            let rankRanks = [];
             for (const rank of data.characterData.character.encounterRankings.ranks) {
                 var date = new Date(rank.startTime).toISOString().substr(0, 10);
                 var duration = new Date(rank.duration * 1000).toISOString().substr(11, 8)
@@ -95,7 +99,48 @@ app.post('/encounter-report', async function (req, res) {
                     class: statics.getClassMap().get(data.characterData.character.classID)
                 }
                 preparedData.push(entry);
+                dpsRanks.push(rank.amount)
+                rankRanks.push(rank.rankPercent)
             }
+
+            dpsRanks.sort(function(a, b) {
+                return b - a;
+            });
+            rankRanks.sort(function(a, b) {
+                return b - a;
+            });
+            let bestRank = 0
+            let avgDps = 0
+            let avgDps3 = 0
+            let avgDps5 = 0
+            let avgRank = 0
+            if (rankRanks.length > 0) {
+                bestRank = rankRanks[0]
+            }
+            if (data.characterData.character.encounterRankings.averagePerformance != null) {
+                avgRank = data.characterData.character.encounterRankings.averagePerformance
+            }
+            if (dpsRanks.length > 0) {
+                //console.log(`DPS RANKS: ${dpsRanks}`)
+                avgDps = getAvg(dpsRanks)
+                dpsRanks.length = Math.min(dpsRanks.length, 5)
+                avgDps5 = getAvg(dpsRanks)
+                dpsRanks.length = Math.min(dpsRanks.length, 3)
+                avgDps3 = getAvg(dpsRanks)
+            }
+            let entry = {
+                name: data.characterData.character.name,
+                bossName: bossName,
+                kills: data.characterData.character.encounterRankings.totalKills,
+                bestRank: bestRank.toFixed(2),
+                avgRank: avgRank.toFixed(2),
+                avgDps: avgDps.toFixed(2),
+                avgDps3: avgDps3.toFixed(2),
+                avgDps5: avgDps5.toFixed(2),
+                bestDps: data.characterData.character.encounterRankings.bestAmount.toFixed(2),
+                class: statics.getClassMap().get(data.characterData.character.classID)
+            }
+            analyzedData.push(entry);
         }
         currentChar++;
     }
@@ -105,10 +150,17 @@ app.post('/encounter-report', async function (req, res) {
         serverName: serverSlug,
         regionName: regionSlug,
         guildCount: guildSet.size,
-        reportData: preparedData
+        reportData: preparedData,
+        analyzedData: analyzedData
     });
 
 });
+
+function getAvg(values) {
+    const total = values.reduce((acc, c) => acc + c, 0);
+    return total / values.length;
+}
+
 
 app.listen(port, function () {
     console.log(`Example app listening on port ${port}!`);
