@@ -37,7 +37,8 @@
             </div>
         </div>
 
-        <% if (failedChars.length > 0) {%>
+        <%
+        if (failedChars.length > 0) {%>
         <div class="row">
             <div class="col">
                 <div class="alert alert-danger" role="alert">The following characters could not be loaded and need to be Updated on Warcraft Logs:
@@ -48,6 +49,15 @@
             </div>
         </div>
         <% } %>
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-info" role="alert">
+                    <form id="metricForm">
+                        Showing <select id="pageMetric" name="pageMetric"><option selected value="BEST">BEST</option><option value="AVG">AVG</option><option value="AVG5">AVG5</option><option value="AVG3">AVG3</option></select>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col">
 
@@ -70,14 +80,19 @@
                             <tr>
                                 <th style="" data-field="name" data-filter-control="input" data-sortable="true"><div class="th-inner ">Name</div></th>
                                 <th style="" data-field="className" data-filter-control="select" data-sortable="true"><div class="th-inner ">Class</div></th>
-                                <th style="" data-field="kills" data-sortable="true"><div class="th-inner ">Kills</div></th>
-                                <th style="" data-field="bestDps" data-sortable="true"><div class="th-inner ">Best DPS</div></th>
-                                <th style="" data-field="avgDps3" data-sortable="true"><div class="th-inner ">Top 3 Avg</div></th>
-                                <th style="" data-field="avgDps5" data-sortable="true"><div class="th-inner ">Top 5 Avg</div></th>
-                                <th style="" data-field="avgDps" data-sortable="true"><div class="th-inner ">Avg Dps</div></th>
-                                <th style="" data-field="bestRank" data-sortable="true"><div class="th-inner ">Best Rank</div></th>
-                                <th style="" data-field="avgRank" data-sortable="true"><div class="th-inner ">Avg Rank</div></th>
-                                <th style="" data-field="bossName"><div class="th-inner ">Boss</div></th>
+                                <th style="" data-field="HKMG_BEST" data-sortable="true" ><div class="th-inner ">HKMG</div></th>
+                                <th style="" data-field="GRUL_BEST" data-sortable="true" ><div class="th-inner ">GRUL</div></th>
+                                <th style="" data-field="MAGT_BEST" data-sortable="true" ><div class="th-inner ">MAGT</div></th>
+                                <th style="" data-field="ATTN_BEST" data-sortable="true" ><div class="th-inner ">ATTN</div></th>
+                                <th style="" data-field="MORS_BEST" data-sortable="true" ><div class="th-inner ">MORS</div></th>
+                                <th style="" data-field="MAID_BEST" data-sortable="true" ><div class="th-inner ">MAID</div></th>
+                                <th style="" data-field="OPRA_BEST" data-sortable="true" ><div class="th-inner ">OPRA</div></th>
+                                <th style="" data-field="CURA_BEST" data-sortable="true" ><div class="th-inner ">CURA</div></th>
+                                <th style="" data-field="ILHF_BEST" data-sortable="true" ><div class="th-inner ">ILHF</div></th>
+                                <th style="" data-field="ARAN_BEST" data-sortable="true" ><div class="th-inner ">ARAN</div></th>
+                                <th style="" data-field="NSPT_BEST" data-sortable="true" ><div class="th-inner ">NSPT</div></th>
+                                <th style="" data-field="PRNC_BEST" data-sortable="true" ><div class="th-inner ">PRNC</div></th>
+                                <th style="" data-field="NTBN_BEST" data-sortable="true" ><div class="th-inner ">NTBN</div></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -135,7 +150,65 @@
     </div>
 
     <script>
+
+
         var $table = $('#table')
+        var $table2 = $('#table2')
+
+        function buildTable2(rebuild) {
+            if (rebuild == 1) $('#table2').bootstrapTable('destroy')
+            $('#table2').bootstrapTable({
+                data: mydata2,
+                columns: [{
+                    field: 'name',
+                    title: 'Character'
+                }, {
+                    field: 'className',
+                    title: 'Class'
+                }, {
+                    field: 'HKMG_' + $('#pageMetric').val(),
+                    title: 'HKMG'
+                }, {
+                    field: 'GRUL_' + $('#pageMetric').val(),
+                    title: 'GRUL'
+                }, {
+                    field: 'MAGT_' + $('#pageMetric').val(),
+                    title: 'MAGT'
+                }, {
+                    field: 'ATTN_' + $('#pageMetric').val(),
+                    title: 'ATTN'
+                }, {
+                    field: 'MORS_' + $('#pageMetric').val(),
+                    title: 'MORS'
+                }, {
+                    field: 'MAID_' + $('#pageMetric').val(),
+                    title: 'MAID'
+                }, {
+                    field: 'OPRA_' + $('#pageMetric').val(),
+                    title: 'OPRA'
+                }, {
+                    field: 'CURA_' + $('#pageMetric').val(),
+                    title: 'CURA'
+                }, {
+                    field: 'ILHF_' + $('#pageMetric').val(),
+                    title: 'ILHF'
+                }, {
+                    field: 'ARAN_' + $('#pageMetric').val(),
+                    title: 'ARAN'
+                }, {
+                    field: 'NSPT_' + $('#pageMetric').val(),
+                    title: 'NSPT'
+                }, {
+                    field: 'PRNC_' + $('#pageMetric').val(),
+                    title: 'PRNC'
+                }, {
+                    field: 'NTBN_' + $('#pageMetric').val(),
+                    title: 'NTBN'
+                }]
+            })
+            //$('#table2').bootstrapTable('load', mydata2)
+            //$('#table2').bootstrapTable('refresh')
+        }
 
         $(function () {
             $('#toolbar').find('select').change(function () {
@@ -147,7 +220,9 @@
             }).trigger('change')
         })
 
-        var $table2 = $('#table2')
+        $(function() {
+            buildTable2();
+        })
 
         $(function () {
             $('#toolbar2').find('select').change(function () {
@@ -157,10 +232,16 @@
                     data: mydata2
                 })
             }).trigger('change')
+
+            $('#pageMetric').change(function(){
+                buildTable2(1);
+            });
         })
 
         var mydata = <%- JSON.stringify(reportData) %>
         var mydata2 = <%- JSON.stringify(analyzedData) %>
+
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>

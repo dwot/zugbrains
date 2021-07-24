@@ -39,6 +39,10 @@ CLASS_MAP.set(9, 'Shaman')
 CLASS_MAP.set(10, 'Warlock')
 CLASS_MAP.set(11, 'Warrior')
 
+const ZONE_NAME_MAP = new Map()
+ZONE_NAME_MAP.set(1007, 'Kara')
+ZONE_NAME_MAP.set(1008, 'GruulMag')
+
 const US_SERVERS = ['atiesh', 'arugal', 'bloodsail-buccaneers', 'faerlina', 'fairbanks', 'grobbulus', 'herod', 'mankrik', 'myzrael', 'pagle', 'remulos', 'thalnos', 'whitemane', 'stalagg', 'blaumeux', 'skeram', 'incendius', 'bigglesworth', 'old-blanchy', 'westfall', 'kurinnaxx', 'kromcrush', 'deviate-delight', 'smolderweb', 'sulfuras', 'ashkandi', 'kirtonos', 'rattlegore', 'felstriker', 'yojamba', 'thunderfury', 'benediction', 'azuresong', 'windseeker', 'anathema', 'netherwind', 'earthfury', 'heartseeker', 'arcanite-reaper', 'loatheb', 'sulthraze']
 const EU_SERVERS = ['golemagg', 'hydraxian-waterlords', 'mirage-raceway', 'pyrewood-village', 'shazzrah', 'zandalar-tribe', 'auberdine', 'sulfuron', 'everlook', 'lucifron', 'chromie', 'flamegor', 'gehennas', 'firemaw', 'flamelash', 'gandling', 'mograine', 'nethergarde-keep', 'razorgore', 'stonespine', 'noggenfogger', 'amnennar', 'ashbringer', 'dreadmist', 'skullflame', 'ten-storms', 'dragons-call', 'lakeshire', 'transcendence', 'finkle', 'bloodfang', 'judgement', 'earthshaker', 'venoxis', 'wyrmthalak', 'rhokdelar', 'razorfen', 'patchwerk', 'heartstriker', 'mandokir', 'harbinger-of-doom', 'dragonfang', 'celebras']
 
@@ -46,7 +50,8 @@ const staticVars = {}
 staticVars.getServersUs = function getServersUs () { return US_SERVERS.sort() }
 staticVars.getServersEu = function getServersEu () { return EU_SERVERS.sort() }
 staticVars.getZoneMap = function getZoneMap () { return ZONE_MAP }
-staticVars.getBossMap = function getBossMap () {   return ENCOUNTER_MAP }
-staticVars.getClassMap = function getClassMap () {  return CLASS_MAP }
+staticVars.getBossMap = function getBossMap () { return ENCOUNTER_MAP }
+staticVars.getClassMap = function getClassMap () { return CLASS_MAP }
+staticVars.getZoneNameMap = function getZoneNameMap () { return ZONE_NAME_MAP }
 
 module.exports = staticVars

@@ -11,6 +11,14 @@
 
 <main>
     <div class="container">
+        <%
+        if (errorText != '') {%>
+            <div class="row">
+                <div class="col">
+                    <div class="alert alert-danger" role="alert"><%=errorText%>></div>
+                </div>
+            </div>
+        <% } %>
         <form action="/encounter-report" method="post">
 
             Guild Name: <input name="guildName" type="text"/> <br/>
@@ -29,13 +37,10 @@
             </select>
             <br/>
             Report Type: <select name="encounterId">
+                <option value="All">All Encounters (SLOW)</option>
                 <% encounters.forEach(function(value, key) { %>
                     <option value="<%=key %>"><%=value %></option>
                 <% }); %>
-                <option value="AllBest" disabled>All Encounters (Best)</option>
-                <option value="AllAvg" disabled>All Encounters (Avg)</option>
-                <option value="All3" disabled>All Encounters (Top3Avg)</option>
-                <option value="All5" disabled>All Encounters (Top5Avg)</option>
             </select> <br />
             <input type="submit" />
         </form>
