@@ -14,7 +14,7 @@
         <form action="/encounter-report" method="post">
 
             Guild Name: <input name="guildName" type="text"/> <br/>
-            Region: <input type="radio" id="regionUS" name="region" value="US">
+            Region: <input type="radio" id="regionUS" name="region" value="US" checked>
             <label for="regionUS">US</label>
             <input type="radio" id="regionEU" name="region" value="EU" >
             <label for="regionEU">EU</label>
@@ -23,34 +23,58 @@
                         <option>NOT LOADED</option>
                     </select>
             <br/>
-            Encounter Id: <select name="encounterId">
+            Metric: <select name="metric">
+                <option value="dps" selected>DPS</option>
+                <option value="hps">HPS</option>
+            </select>
+            <br/>
+            Report Type: <select name="encounterId">
                 <% encounters.forEach(function(value, key) { %>
                     <option value="<%=key %>"><%=value %></option>
                 <% }); %>
-
+                <option value="AllBest" disabled>All Encounters (Best)</option>
+                <option value="AllAvg" disabled>All Encounters (Avg)</option>
+                <option value="All3" disabled>All Encounters (Top3Avg)</option>
+                <option value="All5" disabled>All Encounters (Top5Avg)</option>
             </select> <br />
             <input type="submit" />
         </form>
     </div>
 </main>
 <script>
+    function loadEuServers() {
+        $('#server').empty();
+        <% euServers.forEach(function(value) { %>
+        $('#server').append($('<option>',{text: '<%= value %>', value: '<%= value %>'}))
+        <% }) %>
+        $('#server').change();
+    }
+
+    function loadUsServers() {
+        $('#server').empty();
+        <% usServers.forEach(function(value) { %>
+        $('#server').append($('<option>',{text: '<%= value %>', value: '<%= value %>'}))
+        <% }) %>
+        $('#server').change();
+    }
 
     $(document).ready(function(){
+        var radioValue = $("input[name='region']:checked").val();
+        if(radioValue == 'EU') {
+            loadEuServers();
+        } else {
+            loadUsServers();
+        }
+
         $('#regionUS').change(function(){
-            $('#server').empty();
-            <% usServers.forEach(function(value) { %>
-            $('#server').append($('<option>',{text: '<%= value %>', value: '<%= value %>'}))
-            <% }) %>
-            $('#server').change();
+            loadUsServers();
         });
         $('#regionEU').change(function(){
-            $('#server').empty();
-            <% euServers.forEach(function(value) { %>
-            $('#server').append($('<option>',{text: '<%= value %>', value: '<%= value %>'}))
-            <% }) %>
-            $('#server').change();
+            loadEuServers();
         });
     });
+
+
 </script>
 <footer>
     <%- include('../partials/footer'); %>

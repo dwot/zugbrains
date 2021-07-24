@@ -29,8 +29,6 @@ app.get('/ejs-test', function (req, res) {
 })
 
 app.post('/encounter-report', async function (req, res) {
-  const name = req.body.guildId + ' ' + req.body.encounterId
-  console.log(name + ' Submitted Successfully!')
   const endpoint = 'https://classic.warcraftlogs.com/api/v2/client'
 
   const client = new GraphQLClient(endpoint, {
@@ -43,6 +41,7 @@ app.post('/encounter-report', async function (req, res) {
   const queryName = req.body.guildName
   const region = req.body.region
   const server = req.body.server
+  const metric = req.body.metric
   const encounterId = parseInt(req.body.encounterId)
   // let guildQuery = '{guildData{guild(id:' + guildId +') {id, name, server { slug, region { slug}}}}}'
   // {guildData{guild(name:"pvp",serverSlug:"herod",serverRegion:"US")
@@ -87,7 +86,7 @@ app.post('/encounter-report', async function (req, res) {
     console.log(`CHAR: ${charName}`)
     try {
       if (currentChar < GUILD_ROSTER_LIMIT) {
-        const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ', metric:dps)}}}'
+        const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ', metric:' + metric + ')}}}'
         const data = await client.request(query)
 
         const dpsRanks = []
