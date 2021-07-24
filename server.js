@@ -88,7 +88,7 @@ app.post('/encounter-report', async function (req, res) {
         console.log(`CHAR: ${charName}`)
         try {
             if (currentChar < GUILD_ROSTER_LIMIT) {
-                const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ')}}}'
+                const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ', metric:dps)}}}'
                 const data = await client.request(query)
 
                 let dpsRanks = [];
