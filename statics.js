@@ -40,7 +40,7 @@ CLASS_MAP.set(10, 'Warlock')
 CLASS_MAP.set(11, 'Warrior')
 
 const COLOR_MAP = new Map()
-COLOR_MAP.set('Druid','#FF7D0A')
+COLOR_MAP.set('Druid', '#FF7D0A')
 COLOR_MAP.set('Hunter', '#ABD473')
 COLOR_MAP.set('Mage', '#69CCF0')
 COLOR_MAP.set('Paladin', '#F58CBA')

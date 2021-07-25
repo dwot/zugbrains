@@ -30,9 +30,9 @@
                     </table>
                 </div>
             </div>
-            <div class="col"></div>
-            <div class="col">
-                <canvas id="myChart" width="400" height="400"></canvas>
+            <div class="col-9">
+
+                <canvas id="myChart" width="100%" height="100%"></canvas>
 
             </div>
         </div>
@@ -165,6 +165,7 @@
     </div>
 
     <script>
+        Chart.register(ChartDataLabels);
 
 
         var $table = $('#table')
@@ -212,6 +213,17 @@
                     }]
                 },
                 options: {
+                    plugins: {
+                    legend: {
+                        display: false
+                    },
+                        datalabels: {
+                            color: '#000000',
+                            formatter: function(value, context) {
+                                return value.dataPoint;
+                            }
+                        }
+                    },
                     parsing: {
                         yAxisKey: 'name',
                         xAxisKey: 'dataPoint'
