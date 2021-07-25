@@ -32,7 +32,7 @@
             </div>
             <div class="col"></div>
             <div class="col">
-
+                <canvas id="myChart" width="400" height="400"></canvas>
 
             </div>
         </div>
@@ -54,6 +54,21 @@
                 <div class="alert alert-info" role="alert">
                     <form id="metricForm">
                         Showing <select id="pageMetric" name="pageMetric"><option selected value="BEST">BEST</option><option value="AVG">AVG</option><option value="AVG5">AVG5</option><option value="AVG3">AVG3</option></select>
+                        Graph <select id="graphEncounter" name="graphEncounter">
+                        <option value="HKMG" selected>High King Maulgar</option>
+                        <option value="GRUL">Gruul the Dragonkiller</option>
+                        <option value="MAGT">Magtheridon</option>
+                        <option value="ATTN">Attumen the Huntsman</option>
+                        <option value="MORS">Moroes</option>
+                        <option value="MAID">Maiden of Virtue</option>
+                        <option value="OPRA">Opera Hall</option>
+                        <option value="CURA">The Curator</option>
+                        <option value="ILHF">Terestian Illhoof</option>
+                        <option value="ARAN">Shade of Aran</option>
+                        <option value="NSPT">Netherspite</option>
+                        <option value="PRNC">Prince Malchezaar</option>
+                        <option value="NTBN">Nightbane</option>
+                    </select>
                     </form>
                 </div>
             </div>
@@ -154,11 +169,62 @@
 
         var $table = $('#table')
         var $table2 = $('#table2')
+        var myChart;
+
+        function prepData(rawData) {
+            let resultData = []
+            let dataMap = new Map();
+            let colorMap = new Map();
+            for (let dataEntry of rawData) {
+                dataMap.set(dataEntry.name, eval('dataEntry.' + $('#graphEncounter').val() + '_' + $('#pageMetric').val()))
+                colorMap.set(dataEntry.name, dataEntry.classColor ?? '#FF0000')
+            }
+            let sortedMap= new Map([...dataMap.entries()].sort((a,b) => b[1] - a[1]))
+            for (let key of sortedMap.keys()) {
+                let val = parseInt(sortedMap.get(key))
+                if (val != 0) {
+                    const sortedEntry = {
+                        name: key,
+                        dataPoint: val,
+                        color: colorMap.get(key)
+                    }
+                    resultData.push(sortedEntry)
+                }
+            }
+            return resultData
+        }
+
+        function buildGraph(graphData) {
+            let colors = []
+            for (entry of graphData) {
+                colors.push(entry.color)
+            }
+            if (myChart != null) myChart.destroy();
+            var ctx = document.getElementById('myChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'bar',
+
+                data: {
+                    datasets: [{
+                        data: graphData,
+                        indexAxis: 'y',
+                        backgroundColor: colors,
+                    }]
+                },
+                options: {
+                    parsing: {
+                        yAxisKey: 'name',
+                        xAxisKey: 'dataPoint'
+                    }
+                }
+            });
+        }
 
         function buildTable2(rebuild) {
             if (rebuild == 1) $('#table2').bootstrapTable('destroy')
             $('#table2').bootstrapTable({
                 data: mydata2,
+                stickyHeader: true,
                 columns: [{
                     field: 'name',
                     title: 'Character'
@@ -222,6 +288,8 @@
 
         $(function() {
             buildTable2();
+            let graphData = prepData(mydata2)
+            buildGraph(graphData);
         })
 
         $(function () {
@@ -235,6 +303,13 @@
 
             $('#pageMetric').change(function(){
                 buildTable2(1);
+                let graphData = prepData(mydata2)
+                buildGraph(graphData);
+            });
+
+            $('#graphEncounter').change(function(){
+                let graphData = prepData(mydata2)
+                buildGraph(graphData);
             });
         })
 
@@ -243,10 +318,6 @@
 
 
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/extensions/export/bootstrap-table-export.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.18.3/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 
 
 </main>

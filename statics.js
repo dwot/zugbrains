@@ -39,6 +39,17 @@ CLASS_MAP.set(9, 'Shaman')
 CLASS_MAP.set(10, 'Warlock')
 CLASS_MAP.set(11, 'Warrior')
 
+const COLOR_MAP = new Map()
+COLOR_MAP.set('Druid','#FF7D0A')
+COLOR_MAP.set('Hunter', '#ABD473')
+COLOR_MAP.set('Mage', '#69CCF0')
+COLOR_MAP.set('Paladin', '#F58CBA')
+COLOR_MAP.set('Priest', '#FFFFFF')
+COLOR_MAP.set('Rogue', '#FFF569')
+COLOR_MAP.set('Shaman', '#0070DE')
+COLOR_MAP.set('Warlock', '#9482C9')
+COLOR_MAP.set('Warrior', '#C79C6E')
+
 const ZONE_NAME_MAP = new Map()
 ZONE_NAME_MAP.set(1007, 'Kara')
 ZONE_NAME_MAP.set(1008, 'GruulMag')
@@ -53,5 +64,6 @@ staticVars.getZoneMap = function getZoneMap () { return ZONE_MAP }
 staticVars.getBossMap = function getBossMap () { return ENCOUNTER_MAP }
 staticVars.getClassMap = function getClassMap () { return CLASS_MAP }
 staticVars.getZoneNameMap = function getZoneNameMap () { return ZONE_NAME_MAP }
+staticVars.getColorMap = function getColorMap () { return COLOR_MAP }
 
 module.exports = staticVars

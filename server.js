@@ -125,6 +125,7 @@ app.post('/encounter-report', async function (req, res) {
             const characterEntry = {
               name: charName,
               className: charClass,
+              classColor: statics.getColorMap().get(charClass),
               // HKMG
               HKMG_BEST: charEncounters.get(649).bestDps,
               HKMG_AVG: charEncounters.get(649).avgDps,
@@ -256,7 +257,8 @@ async function getCharacterEncounterReport (charName, serverSlug, regionSlug, en
       pct: rank.rankPercent,
       todayPct: rank.todayPercent,
       spec: rank.spec,
-      className: statics.getClassMap().get(data.characterData.character.classID)
+      className: statics.getClassMap().get(data.characterData.character.classID),
+      classColor: statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID)),
     }
     rawData.push(rawEntry)
     dpsRanks.push(rank.amount)
