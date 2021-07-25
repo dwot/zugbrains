@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Roboto&display=swap');
+body {
+    font-family: 'Roboto', sans-serif !important;
+}
+.titleLogo {
+    font-family: 'Amatic SC', sans-serif !important;
+}
+#toolbar {
+    margin: 0;
+}

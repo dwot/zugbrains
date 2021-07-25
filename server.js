@@ -16,10 +16,10 @@ const client = new GraphQLClient(endpoint, {
 })
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
-
+app.use(express.static('views/static'))
 app.get('/', function (req, res) {
   res.render('pages/index', {
-    title: 'ZugBrains: Zug Zug',
+    title: '',
     encounters: statics.getBossMap(),
     usServers: statics.getServersUs(),
     euServers: statics.getServersEu(),
@@ -33,7 +33,7 @@ app.get('/static', function (req, res) {
 // index page
 app.get('/ejs-test', function (req, res) {
   res.render('pages/index', {
-    title: 'ZugBrains: Sample Rendered Page'
+    title: 'Sample Rendered Page'
   })
 })
 
@@ -105,19 +105,21 @@ app.post('/encounter-report', async function (req, res) {
             for (const rawEntry of entry.rawData) {
               preparedData.push(rawEntry)
             }
+          } else {
+            failedChars.push(entry.name)
           }
         }
       } catch (error) {
         console.log(`ERR2 ${error}}`, error)
       }
       const bossName = statics.getBossMap().get(encounterId)
-      reportTitle = `ZugBrains: ${guildName} ${bossName} Report`
+      reportTitle = `<${guildName}> ${bossName} Report`
     } else {
       for (const charName of guildList) {
         console.log(`CHAR: ${charName} (${currentChar})`)
         try {
           const charReport = await getCharacterFullReport(charName, serverSlug, regionSlug, metric)
-          reportTitle = `ZugBrains: ${guildName} ${reportType} Report`
+          reportTitle = `<${guildName}> ${reportType} Report`
           // All Reports
           // AllBest, AllAvg, All3, All5
           const charEncounters = charReport.charEncounters
@@ -129,79 +131,84 @@ app.post('/encounter-report', async function (req, res) {
             }
             charClass = entry.className
           }
-          const characterEntry = {
-            name: charName,
-            className: charClass,
-            classColor: statics.getColorMap().get(charClass),
-            // HKMG
-            HKMG_BEST: charEncounters.get(649).bestDps,
-            HKMG_AVG: charEncounters.get(649).avgDps,
-            HKMG_AVG5: charEncounters.get(649).avgDps5,
-            HKMG_AVG3: charEncounters.get(649).avgDps3,
-            // GRUL
-            GRUL_BEST: charEncounters.get(650).bestDps,
-            GRUL_AVG: charEncounters.get(650).avgDps,
-            GRUL_AVG5: charEncounters.get(650).avgDps5,
-            GRUL_AVG3: charEncounters.get(650).avgDps3,
-            // MAGT
-            MAGT_BEST: charEncounters.get(651).bestDps,
-            MAGT_AVG: charEncounters.get(651).avgDps,
-            MAGT_AVG5: charEncounters.get(651).avgDps5,
-            MAGT_AVG3: charEncounters.get(651).avgDps3,
-            // ATTN
-            ATTN_BEST: charEncounters.get(652).bestDps,
-            ATTN_AVG: charEncounters.get(652).avgDps,
-            ATTN_AVG5: charEncounters.get(652).avgDps5,
-            ATTN_AVG3: charEncounters.get(652).avgDps3,
-            // MORS
-            MORS_BEST: charEncounters.get(653).bestDps,
-            MORS_AVG: charEncounters.get(653).avgDps,
-            MORS_AVG5: charEncounters.get(653).avgDps5,
-            MORS_AVG3: charEncounters.get(653).avgDps3,
-            // MAID
-            MAID_BEST: charEncounters.get(654).bestDps,
-            MAID_AVG: charEncounters.get(654).avgDps,
-            MAID_AVG5: charEncounters.get(654).avgDps5,
-            MAID_AVG3: charEncounters.get(654).avgDps3,
-            // OPRA
-            OPRA_BEST: charEncounters.get(655).bestDps,
-            OPRA_AVG: charEncounters.get(655).avgDps,
-            OPRA_AVG5: charEncounters.get(655).avgDps5,
-            OPRA_AVG3: charEncounters.get(655).avgDps3,
-            // CURA
-            CURA_BEST: charEncounters.get(656).bestDps,
-            CURA_AVG: charEncounters.get(656).avgDps,
-            CURA_AVG5: charEncounters.get(656).avgDps5,
-            CURA_AVG3: charEncounters.get(656).avgDps3,
-            // ILHF
-            ILHF_BEST: charEncounters.get(657).bestDps,
-            ILHF_AVG: charEncounters.get(657).avgDps,
-            ILHF_AVG5: charEncounters.get(657).avgDps5,
-            ILHF_AVG3: charEncounters.get(657).avgDps3,
-            // ARAN
-            ARAN_BEST: charEncounters.get(658).bestDps,
-            ARAN_AVG3: charEncounters.get(658).avgDps,
-            ARAN_AVG5: charEncounters.get(658).avgDps5,
-            ARAN_AVG: charEncounters.get(658).avgDps3,
-            // NSPT
-            NSPT_BEST: charEncounters.get(659).bestDps,
-            NSPT_AVG: charEncounters.get(659).avgDps,
-            NSPT_AVG5: charEncounters.get(659).avgDps5,
-            NSPT_AVG3: charEncounters.get(659).avgDps3,
-            // PRNC
-            PRNC_BEST: charEncounters.get(661).bestDps,
-            PRNC_AVG: charEncounters.get(661).avgDps,
-            PRNC_AVG5: charEncounters.get(661).avgDps5,
-            PRNC_AVG3: charEncounters.get(661).avgDps3,
-            // NTBN
-            NTBN_BEST: charEncounters.get(662).bestDps,
-            NTBN_AVG: charEncounters.get(662).avgDps,
-            NTBN_AVG5: charEncounters.get(662).avgDps5,
-            NTBN_AVG3: charEncounters.get(662).avgDps3,
+          if (charClass !== 'Phantom') {
+              const characterEntry = {
+                name: charName,
+                className: charClass,
+                classColor: statics.getColorMap().get(charClass),
+                // HKMG
+                HKMG_BEST: charEncounters.get(649).bestDps,
+                HKMG_AVG: charEncounters.get(649).avgDps,
+                HKMG_AVG5: charEncounters.get(649).avgDps5,
+                HKMG_AVG3: charEncounters.get(649).avgDps3,
+                // GRUL
+                GRUL_BEST: charEncounters.get(650).bestDps,
+                GRUL_AVG: charEncounters.get(650).avgDps,
+                GRUL_AVG5: charEncounters.get(650).avgDps5,
+                GRUL_AVG3: charEncounters.get(650).avgDps3,
+                // MAGT
+                MAGT_BEST: charEncounters.get(651).bestDps,
+                MAGT_AVG: charEncounters.get(651).avgDps,
+                MAGT_AVG5: charEncounters.get(651).avgDps5,
+                MAGT_AVG3: charEncounters.get(651).avgDps3,
+                // ATTN
+                ATTN_BEST: charEncounters.get(652).bestDps,
+                ATTN_AVG: charEncounters.get(652).avgDps,
+                ATTN_AVG5: charEncounters.get(652).avgDps5,
+                ATTN_AVG3: charEncounters.get(652).avgDps3,
+                // MORS
+                MORS_BEST: charEncounters.get(653).bestDps,
+                MORS_AVG: charEncounters.get(653).avgDps,
+                MORS_AVG5: charEncounters.get(653).avgDps5,
+                MORS_AVG3: charEncounters.get(653).avgDps3,
+                // MAID
+                MAID_BEST: charEncounters.get(654).bestDps,
+                MAID_AVG: charEncounters.get(654).avgDps,
+                MAID_AVG5: charEncounters.get(654).avgDps5,
+                MAID_AVG3: charEncounters.get(654).avgDps3,
+                // OPRA
+                OPRA_BEST: charEncounters.get(655).bestDps,
+                OPRA_AVG: charEncounters.get(655).avgDps,
+                OPRA_AVG5: charEncounters.get(655).avgDps5,
+                OPRA_AVG3: charEncounters.get(655).avgDps3,
+                // CURA
+                CURA_BEST: charEncounters.get(656).bestDps,
+                CURA_AVG: charEncounters.get(656).avgDps,
+                CURA_AVG5: charEncounters.get(656).avgDps5,
+                CURA_AVG3: charEncounters.get(656).avgDps3,
+                // ILHF
+                ILHF_BEST: charEncounters.get(657).bestDps,
+                ILHF_AVG: charEncounters.get(657).avgDps,
+                ILHF_AVG5: charEncounters.get(657).avgDps5,
+                ILHF_AVG3: charEncounters.get(657).avgDps3,
+                // ARAN
+                ARAN_BEST: charEncounters.get(658).bestDps,
+                ARAN_AVG3: charEncounters.get(658).avgDps,
+                ARAN_AVG5: charEncounters.get(658).avgDps5,
+                ARAN_AVG: charEncounters.get(658).avgDps3,
+                // NSPT
+                NSPT_BEST: charEncounters.get(659).bestDps,
+                NSPT_AVG: charEncounters.get(659).avgDps,
+                NSPT_AVG5: charEncounters.get(659).avgDps5,
+                NSPT_AVG3: charEncounters.get(659).avgDps3,
+                // PRNC
+                PRNC_BEST: charEncounters.get(661).bestDps,
+                PRNC_AVG: charEncounters.get(661).avgDps,
+                PRNC_AVG5: charEncounters.get(661).avgDps5,
+                PRNC_AVG3: charEncounters.get(661).avgDps3,
+                // NTBN
+                NTBN_BEST: charEncounters.get(662).bestDps,
+                NTBN_AVG: charEncounters.get(662).avgDps,
+                NTBN_AVG5: charEncounters.get(662).avgDps5,
+                NTBN_AVG3: charEncounters.get(662).avgDps3,
 
-            bossEntry: charEncounters
+                bossEntry: charEncounters
+              }
+              analyzedData.push(characterEntry)
+
+          } else {
+            failedChars.push(charName)
           }
-          analyzedData.push(characterEntry)
         } catch (error) {
           console.error(error)
           failedChars.push(charName)
@@ -226,7 +233,7 @@ app.post('/encounter-report', async function (req, res) {
   } catch (error) {
     console.error(error)
     res.render('pages/index', {
-      title: 'ZugBrains: Zug Zug',
+      title: '',
       encounters: statics.getBossMap(),
       usServers: statics.getServersUs(),
       euServers: statics.getServersEu(),

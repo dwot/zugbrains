@@ -3,58 +3,56 @@
 <head>
     <%- include('../partials/head'); %>
 </head>
-<body class="container">
+<body>
 
-<header>
+<div className="container-fluid">
     <%- include('../partials/header'); %>
-</header>
-
-
-<style>
-    #toolbar {
-        margin: 0;
-    }
-</style>
-
-
-<main>
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="container container-sm">
-                    <table class="table table-dark table-striped table-bordered table-sm table-responsive">
-                        <tr><th scope="row">Guild:</th><td><%=guildName%></td></tr>
-                        <tr><th scope="row">Server:</th><td><%=serverName%></td></tr>
-                        <tr><th scope="row">Region:</th><td><%=regionName%></td></tr>
-                        <tr><th scope="row">Total Guildies:</th><td><%=guildCount%></td></tr>
-                    </table>
-                </div>
-            </div>
-            <div class="col-9">
-
-                <canvas id="myChart" width="100%" height="100%"></canvas>
-
-            </div>
+    <div class="row">
+        <div class="col-sm-auto">
+            <table class="table table-dark table-striped table-bordered">
+                <tr>
+                    <th scope="row">Guild:</th>
+                    <td>&lt;<%= guildName %>&gt;</td>
+                </tr>
+                <tr>
+                    <th scope="row">Server:</th>
+                    <td><%= serverName %></td>
+                </tr>
+                <tr>
+                    <th scope="row">Region:</th>
+                    <td><%= regionName %></td>
+                </tr>
+                <tr>
+                    <th scope="row">Total Guildies:</th>
+                    <td><%= guildCount %></td>
+                </tr>
+            </table>
         </div>
+        <div class="col-md-10">
+            <% if (failedChars.length > 0) { %>
+                <div class="alert alert-danger" role="alert">
+                    The following characters could not be loaded and need to be Updated on Warcraft Logs:<br/>
+                    <%
+                    let failCharCount = 0;
+                    failedChars.forEach(function(value) {
+                        failCharCount++;%>
+                        <%= value %>
 
-        <%
-        if (failedChars.length > 0) {%>
-        <div class="row">
-            <div class="col">
-                <div class="alert alert-danger" role="alert">The following characters could not be loaded and need to be Updated on Warcraft Logs:
-                    <% failedChars.forEach(function(value) { %>
-                               <%= value %>,
-                    <% }) %>
+                    <%if (failCharCount != failedChars.lenth) {%>
+                      <%=','%>
+                    <%}
+                    }) %>
                 </div>
-            </div>
-        </div>
-        <% } %>
-        <div class="row">
-            <div class="col">
-                <div class="alert alert-info" role="alert">
-                    <form id="metricForm">
-                        Showing <select id="pageMetric" name="pageMetric"><option selected value="BEST">BEST</option><option value="AVG">AVG</option><option value="AVG5">AVG5</option><option value="AVG3">AVG3</option></select>
-                        Graph <select id="graphEncounter" name="graphEncounter">
+            <% } %>
+            <div class="alert alert-info" role="alert">
+                <form id="metricForm">
+                    Showing <select id="pageMetric" name="pageMetric">
+                        <option selected value="BEST">BEST</option>
+                        <option value="AVG">AVG</option>
+                        <option value="AVG5">AVG5</option>
+                        <option value="AVG3">AVG3</option>
+                    </select>
+                    Graph <select id="graphEncounter" name="graphEncounter">
                         <option value="HKMG" selected>High King Maulgar</option>
                         <option value="GRUL">Gruul the Dragonkiller</option>
                         <option value="MAGT">Magtheridon</option>
@@ -69,267 +67,321 @@
                         <option value="PRNC">Prince Malchezaar</option>
                         <option value="NTBN">Nightbane</option>
                     </select>
-                    </form>
-                </div>
+                </form>
             </div>
+            <canvas id="myChart" width="100%"></canvas>
         </div>
-        <div class="row">
-            <div class="col">
+    </div>
 
-
-                <div>
-                    <div id="toolbar2" class="select">
-                        <select class="form-control">
-                            <option value="">Export Basic</option>
-                            <option value="all">Export All</option>
-                            <option value="selected">Export Selected</option>
-                        </select>
-                    </div>
-
-
-                        <table id="table2" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar2"
-                               data-show-toggle="true" data-show-columns="true"
-                               data-filter-control="true"  class="table table-bordered table-hover table-dark table-striped table-responsive ">
-
-                            <thead class="">
-                            <tr>
-                                <th style="" data-field="name" data-filter-control="input" data-sortable="true"><div class="th-inner ">Name</div></th>
-                                <th style="" data-field="className" data-filter-control="select" data-sortable="true"><div class="th-inner ">Class</div></th>
-                                <th style="" data-field="HKMG_BEST" data-sortable="true" ><div class="th-inner ">HKMG</div></th>
-                                <th style="" data-field="GRUL_BEST" data-sortable="true" ><div class="th-inner ">GRUL</div></th>
-                                <th style="" data-field="MAGT_BEST" data-sortable="true" ><div class="th-inner ">MAGT</div></th>
-                                <th style="" data-field="ATTN_BEST" data-sortable="true" ><div class="th-inner ">ATTN</div></th>
-                                <th style="" data-field="MORS_BEST" data-sortable="true" ><div class="th-inner ">MORS</div></th>
-                                <th style="" data-field="MAID_BEST" data-sortable="true" ><div class="th-inner ">MAID</div></th>
-                                <th style="" data-field="OPRA_BEST" data-sortable="true" ><div class="th-inner ">OPRA</div></th>
-                                <th style="" data-field="CURA_BEST" data-sortable="true" ><div class="th-inner ">CURA</div></th>
-                                <th style="" data-field="ILHF_BEST" data-sortable="true" ><div class="th-inner ">ILHF</div></th>
-                                <th style="" data-field="ARAN_BEST" data-sortable="true" ><div class="th-inner ">ARAN</div></th>
-                                <th style="" data-field="NSPT_BEST" data-sortable="true" ><div class="th-inner ">NSPT</div></th>
-                                <th style="" data-field="PRNC_BEST" data-sortable="true" ><div class="th-inner ">PRNC</div></th>
-                                <th style="" data-field="NTBN_BEST" data-sortable="true" ><div class="th-inner ">NTBN</div></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
+    <div class="row">
+        <div class="col-lg-auto">
+            <p>
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#reportDataCollapse"
+                        aria-expanded="false" aria-controls="reportDataCollapse">
+                    Show Report Table Data
+                </button>
+            </p>
+            <div id="toolbar2" class="select">
+                <select class="form-control">
+                    <option value="">Export Basic</option>
+                    <option value="all">Export All</option>
+                    <option value="selected">Export Selected</option>
+                </select>
             </div>
-        </div>
 
+            <div class="collapse" id="reportDataCollapse">
+                <table id="table2" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar2"
+                       data-show-toggle="true" data-show-columns="true"
+                       data-filter-control="true"
+                       class="table table-bordered table-hover table-dark table-striped table-responsive ">
 
-        <div class="row">
-            <div class="col">
-
-                <p>
-                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                        Show Raw Data
-                    </button>
-                </p>
-
-                <div>
-                    <div id="toolbar" class="select">
-                        <select class="form-control">
-                            <option value="">Export Basic</option>
-                            <option value="all">Export All</option>
-                            <option value="selected">Export Selected</option>
-                        </select>
-                    </div>
-                <div class="collapse" id="collapseExample">
-
-
-                        <table id="table" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar"
-                               data-show-toggle="true" data-show-columns="true" class="table table-bordered table-hover table-dark table-striped table-responsive">
-
-                            <thead class="">
-                            <tr>
-                                <th style="" data-field="name"><div class="th-inner ">Name</div></th>
-                                <th style="" data-field="bossName"><div class="th-inner ">Boss</div></th>
-                                <th style="" data-field="guildName"><div class="th-inner ">Guild</div></th>
-                                <th style="" data-field="date"><div class="th-inner ">Date</div></th>
-                                <th style="" data-field="dps"><div class="th-inner ">DPS</div></th>
-                                <th style="" data-field="duration"><div class="th-inner ">Duration</div></th>
-                                <th style="" data-field="pct"><div class="th-inner ">HistRank</div></th>
-                                <th style="" data-field="todayPct"><div class="th-inner ">TodayRank</div></th>
-                                <th style="" data-field="className"><div class="th-inner ">Class</div></th>
-                                <th style="" data-field="spec"><div class="th-inner ">Spec</div></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                    <thead class="">
+                    <tr>
+                        <th style="" data-field="name" data-filter-control="input" data-sortable="true">
+                            <div class="th-inner ">Name</div>
+                        </th>
+                        <th style="" data-field="className" data-filter-control="select" data-sortable="true">
+                            <div class="th-inner ">Class</div>
+                        </th>
+                        <th style="" data-field="HKMG_BEST" data-sortable="true">
+                            <div class="th-inner ">HKMG</div>
+                        </th>
+                        <th style="" data-field="GRUL_BEST" data-sortable="true">
+                            <div class="th-inner ">GRUL</div>
+                        </th>
+                        <th style="" data-field="MAGT_BEST" data-sortable="true">
+                            <div class="th-inner ">MAGT</div>
+                        </th>
+                        <th style="" data-field="ATTN_BEST" data-sortable="true">
+                            <div class="th-inner ">ATTN</div>
+                        </th>
+                        <th style="" data-field="MORS_BEST" data-sortable="true">
+                            <div class="th-inner ">MORS</div>
+                        </th>
+                        <th style="" data-field="MAID_BEST" data-sortable="true">
+                            <div class="th-inner ">MAID</div>
+                        </th>
+                        <th style="" data-field="OPRA_BEST" data-sortable="true">
+                            <div class="th-inner ">OPRA</div>
+                        </th>
+                        <th style="" data-field="CURA_BEST" data-sortable="true">
+                            <div class="th-inner ">CURA</div>
+                        </th>
+                        <th style="" data-field="ILHF_BEST" data-sortable="true">
+                            <div class="th-inner ">ILHF</div>
+                        </th>
+                        <th style="" data-field="ARAN_BEST" data-sortable="true">
+                            <div class="th-inner ">ARAN</div>
+                        </th>
+                        <th style="" data-field="NSPT_BEST" data-sortable="true">
+                            <div class="th-inner ">NSPT</div>
+                        </th>
+                        <th style="" data-field="PRNC_BEST" data-sortable="true">
+                            <div class="th-inner ">PRNC</div>
+                        </th>
+                        <th style="" data-field="NTBN_BEST" data-sortable="true">
+                            <div class="th-inner ">NTBN</div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <script>
-        Chart.register(ChartDataLabels);
+
+    <div class="row">
+        <div class="col-lg-auto">
+            <p>
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#rawDataCollapse"
+                        aria-expanded="false" aria-controls="rawDataCollapse">
+                    Show Raw Data
+                </button>
+            </p>
+
+            <div id="toolbar" class="select">
+                <select class="form-control">
+                    <option value="">Export Basic</option>
+                    <option value="all">Export All</option>
+                    <option value="selected">Export Selected</option>
+                </select>
+            </div>
+            <div class="collapse" id="rawDataCollapse">
 
 
-        var $table = $('#table')
-        var $table2 = $('#table2')
-        var myChart;
+                <table id="table" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar"
+                       data-show-toggle="true" data-show-columns="true"
+                       class="table table-bordered table-hover table-dark table-striped table-responsive">
 
-        function prepData(rawData) {
-            let resultData = []
-            let dataMap = new Map();
-            let colorMap = new Map();
-            for (let dataEntry of rawData) {
-                dataMap.set(dataEntry.name, eval('dataEntry.' + $('#graphEncounter').val() + '_' + $('#pageMetric').val()))
-                colorMap.set(dataEntry.name, dataEntry.classColor ?? '#FF0000')
-            }
-            let sortedMap= new Map([...dataMap.entries()].sort((a,b) => b[1] - a[1]))
-            for (let key of sortedMap.keys()) {
-                let val = parseInt(sortedMap.get(key))
-                if (val != 0) {
-                    const sortedEntry = {
-                        name: key,
-                        dataPoint: val,
-                        color: colorMap.get(key)
-                    }
-                    resultData.push(sortedEntry)
-                }
-            }
-            return resultData
+                    <thead class="">
+                    <tr>
+                        <th style="" data-field="name">
+                            <div class="th-inner ">Name</div>
+                        </th>
+                        <th style="" data-field="bossName">
+                            <div class="th-inner ">Boss</div>
+                        </th>
+                        <th style="" data-field="guildName">
+                            <div class="th-inner ">Guild</div>
+                        </th>
+                        <th style="" data-field="date">
+                            <div class="th-inner ">Date</div>
+                        </th>
+                        <th style="" data-field="dps">
+                            <div class="th-inner ">DPS</div>
+                        </th>
+                        <th style="" data-field="duration">
+                            <div class="th-inner ">Duration</div>
+                        </th>
+                        <th style="" data-field="pct">
+                            <div class="th-inner ">HistRank</div>
+                        </th>
+                        <th style="" data-field="todayPct">
+                            <div class="th-inner ">TodayRank</div>
+                        </th>
+                        <th style="" data-field="className">
+                            <div class="th-inner ">Class</div>
+                        </th>
+                        <th style="" data-field="spec">
+                            <div class="th-inner ">Spec</div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    Chart.register(ChartDataLabels);
+
+
+    var $table = $('#table')
+    var $table2 = $('#table2')
+    var myChart;
+
+    function prepData(rawData) {
+        let resultData = []
+        let dataMap = new Map();
+        let colorMap = new Map();
+        for (let dataEntry of rawData) {
+            dataMap.set(dataEntry.name, eval('dataEntry.' + $('#graphEncounter').val() + '_' + $('#pageMetric').val()))
+            colorMap.set(dataEntry.name, dataEntry.classColor ?? '#FF0000')
         }
-
-        function buildGraph(graphData) {
-            let colors = []
-            for (entry of graphData) {
-                colors.push(entry.color)
+        let sortedMap = new Map([...dataMap.entries()].sort((a, b) => b[1] - a[1]))
+        for (let key of sortedMap.keys()) {
+            let val = parseInt(sortedMap.get(key))
+            if (val != 0) {
+                const sortedEntry = {
+                    name: key,
+                    dataPoint: val,
+                    color: colorMap.get(key)
+                }
+                resultData.push(sortedEntry)
             }
-            if (myChart != null) myChart.destroy();
-            var ctx = document.getElementById('myChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'bar',
+        }
+        return resultData
+    }
 
-                data: {
-                    datasets: [{
-                        data: graphData,
-                        indexAxis: 'y',
-                        backgroundColor: colors,
-                    }]
-                },
-                options: {
-                    plugins: {
+    function buildGraph(graphData) {
+        let colors = []
+        for (entry of graphData) {
+            colors.push(entry.color)
+        }
+        if (myChart != null) myChart.destroy();
+        var ctx = document.getElementById('myChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'bar',
+
+            data: {
+                datasets: [{
+                    data: graphData,
+                    indexAxis: 'y',
+                    backgroundColor: colors,
+                }]
+            },
+            options: {
+                plugins: {
                     legend: {
                         display: false
                     },
-                        datalabels: {
-                            color: '#000000',
-                            formatter: function(value, context) {
-                                return value.dataPoint;
-                            }
+                    datalabels: {
+                        color: '#000000',
+                        formatter: function (value, context) {
+                            return value.dataPoint;
                         }
-                    },
-                    parsing: {
-                        yAxisKey: 'name',
-                        xAxisKey: 'dataPoint'
                     }
+                },
+                parsing: {
+                    yAxisKey: 'name',
+                    xAxisKey: 'dataPoint'
                 }
-            });
-        }
+            }
+        });
+    }
 
-        function buildTable2(rebuild) {
-            if (rebuild == 1) $('#table2').bootstrapTable('destroy')
-            $('#table2').bootstrapTable({
-                data: mydata2,
-                stickyHeader: true,
-                columns: [{
-                    field: 'name',
-                    title: 'Character'
-                }, {
-                    field: 'className',
-                    title: 'Class'
-                }, {
-                    field: 'HKMG_' + $('#pageMetric').val(),
-                    title: 'HKMG'
-                }, {
-                    field: 'GRUL_' + $('#pageMetric').val(),
-                    title: 'GRUL'
-                }, {
-                    field: 'MAGT_' + $('#pageMetric').val(),
-                    title: 'MAGT'
-                }, {
-                    field: 'ATTN_' + $('#pageMetric').val(),
-                    title: 'ATTN'
-                }, {
-                    field: 'MORS_' + $('#pageMetric').val(),
-                    title: 'MORS'
-                }, {
-                    field: 'MAID_' + $('#pageMetric').val(),
-                    title: 'MAID'
-                }, {
-                    field: 'OPRA_' + $('#pageMetric').val(),
-                    title: 'OPRA'
-                }, {
-                    field: 'CURA_' + $('#pageMetric').val(),
-                    title: 'CURA'
-                }, {
-                    field: 'ILHF_' + $('#pageMetric').val(),
-                    title: 'ILHF'
-                }, {
-                    field: 'ARAN_' + $('#pageMetric').val(),
-                    title: 'ARAN'
-                }, {
-                    field: 'NSPT_' + $('#pageMetric').val(),
-                    title: 'NSPT'
-                }, {
-                    field: 'PRNC_' + $('#pageMetric').val(),
-                    title: 'PRNC'
-                }, {
-                    field: 'NTBN_' + $('#pageMetric').val(),
-                    title: 'NTBN'
-                }]
-            })
-            //$('#table2').bootstrapTable('load', mydata2)
-            //$('#table2').bootstrapTable('refresh')
-        }
-
-        $(function () {
-            $('#toolbar').find('select').change(function () {
-                $table.bootstrapTable({
-                    exportDataType: $(this).val(),
-                    exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
-                    data: mydata
-                })
-            }).trigger('change')
+    function buildTable2(rebuild) {
+        if (rebuild == 1) $('#table2').bootstrapTable('destroy')
+        $('#table2').bootstrapTable({
+            data: mydata2,
+            columns: [{
+                field: 'name',
+                title: 'Character'
+            }, {
+                field: 'className',
+                title: 'Class'
+            }, {
+                field: 'HKMG_' + $('#pageMetric').val(),
+                title: 'HKMG'
+            }, {
+                field: 'GRUL_' + $('#pageMetric').val(),
+                title: 'GRUL'
+            }, {
+                field: 'MAGT_' + $('#pageMetric').val(),
+                title: 'MAGT'
+            }, {
+                field: 'ATTN_' + $('#pageMetric').val(),
+                title: 'ATTN'
+            }, {
+                field: 'MORS_' + $('#pageMetric').val(),
+                title: 'MORS'
+            }, {
+                field: 'MAID_' + $('#pageMetric').val(),
+                title: 'MAID'
+            }, {
+                field: 'OPRA_' + $('#pageMetric').val(),
+                title: 'OPRA'
+            }, {
+                field: 'CURA_' + $('#pageMetric').val(),
+                title: 'CURA'
+            }, {
+                field: 'ILHF_' + $('#pageMetric').val(),
+                title: 'ILHF'
+            }, {
+                field: 'ARAN_' + $('#pageMetric').val(),
+                title: 'ARAN'
+            }, {
+                field: 'NSPT_' + $('#pageMetric').val(),
+                title: 'NSPT'
+            }, {
+                field: 'PRNC_' + $('#pageMetric').val(),
+                title: 'PRNC'
+            }, {
+                field: 'NTBN_' + $('#pageMetric').val(),
+                title: 'NTBN'
+            }]
         })
+        //$('#table2').bootstrapTable('load', mydata2)
+        //$('#table2').bootstrapTable('refresh')
+    }
 
-        $(function() {
-            buildTable2();
+    $(function () {
+        $('#toolbar').find('select').change(function () {
+            $table.bootstrapTable({
+                exportDataType: $(this).val(),
+                exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
+                data: mydata
+            })
+        }).trigger('change')
+    })
+
+    $(function () {
+        buildTable2();
+        let graphData = prepData(mydata2)
+        buildGraph(graphData);
+    })
+
+    $(function () {
+        $('#toolbar2').find('select').change(function () {
+            $table2.bootstrapTable({
+                exportDataType: $(this).val(),
+                exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
+                data: mydata2
+            })
+        }).trigger('change')
+
+        $('#pageMetric').change(function () {
+            buildTable2(1);
             let graphData = prepData(mydata2)
             buildGraph(graphData);
-        })
+        });
 
-        $(function () {
-            $('#toolbar2').find('select').change(function () {
-                $table2.bootstrapTable({
-                    exportDataType: $(this).val(),
-                    exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
-                    data: mydata2
-                })
-            }).trigger('change')
+        $('#graphEncounter').change(function () {
+            let graphData = prepData(mydata2)
+            buildGraph(graphData);
+        });
+    })
 
-            $('#pageMetric').change(function(){
-                buildTable2(1);
-                let graphData = prepData(mydata2)
-                buildGraph(graphData);
-            });
-
-            $('#graphEncounter').change(function(){
-                let graphData = prepData(mydata2)
-                buildGraph(graphData);
-            });
-        })
-
-        var mydata = <%- JSON.stringify(reportData) %>
-        var mydata2 = <%- JSON.stringify(analyzedData) %>
+    var mydata = <%- JSON.stringify(reportData) %>
+    var mydata2 = <%- JSON.stringify(analyzedData) %>
 
 
-    </script>
+</script>
 
 
 </main>
