@@ -2,12 +2,19 @@ const { GraphQLClient } = require('graphql-request')
 const secrets = require('./secrets')
 const statics = require('./statics')
 const express = require('express')
+const mongoose = require('mongoose');
+var faker = require("faker");
+
 const app = express()
 app.set('view engine', 'ejs')
 require('dotenv').config()
 const WCL_TOKEN = (secrets.read('WCL_TOKEN') || process.env.WCL_TOKEN || '')
+const MONGO_CONN_URL = (secrets.read('MONGO_CONN_URL') || process.env.MONGO_CONN_URL || '')
+var thingSchema = new mongoose.Schema({queryString: String, queryDate: Date }, { strict: false })
 const port = process.env.PORT || 3000
 const endpoint = 'https://classic.warcraftlogs.com/api/v2/client'
+const Cat = mongoose.model('Cat', { name: String })
+const CachedQuery = mongoose.model('CachedQuery', thingSchema)
 
 const client = new GraphQLClient(endpoint, {
   headers: {
@@ -17,6 +24,24 @@ const client = new GraphQLClient(endpoint, {
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('views/static'))
+
+app.get('/dbtest', async function (req, res) {
+  let numbers = []
+  var randomName = faker.name.findName();
+  mongoose.connect(MONGO_CONN_URL, {useNewUrlParser: true, useUnifiedTopology: true});
+  const kitty = new Cat({ name: randomName });
+  kitty.save().then(() => console.log(`meow ${randomName}`));
+  const kittens = await Cat.find();
+  for (let kitty of kittens) {
+    console.log(`CAT ${kitty.name}`);
+  }
+
+  res.render('pages/dbtest', {
+    title: 'dbtest',
+    numbers: []
+  })
+});
+
 app.get('/', function (req, res) {
   res.render('pages/index', {
     title: '',
@@ -58,7 +83,7 @@ app.post('/encounter-report', async function (req, res) {
     // let guildQuery = '{guildData{guild(id:' + guildId +') {id, name, server { slug, region { slug}}}}}'
     // {guildData{guild(name:"pvp",serverSlug:"herod",serverRegion:"US")
     const guildQuery = '{guildData{guild(name:"' + queryName + '",serverSlug:"' + server + '",serverRegion:"' + region + '") {id, name, server { slug, region { slug}}}}}'
-    const guildData = await client.request(guildQuery)
+    const guildData = await getCachedQuery(client, guildQuery)
     const guildName = guildData.guildData.guild.name
     const serverSlug = guildData.guildData.guild.server.slug
     const regionSlug = guildData.guildData.guild.server.region.slug
@@ -68,13 +93,13 @@ app.post('/encounter-report', async function (req, res) {
     const guildSet = new Set()
     for (const zoneId of zoneIdArr) {
       let rosterQuery = '{reportData {reports(guildID:' + guildId + ',zoneID:' + zoneId + ') {total, per_page, last_page, current_page, data {rankedCharacters { name }}}}}'
-      let rosterData = await client.request(rosterQuery)
+      let rosterData = await getCachedQuery(client, rosterQuery)
       const lastPage = rosterData.reportData.reports.last_page
       let currentPage = rosterData.reportData.reports.current_page
 
       while (currentPage <= lastPage) {
         rosterQuery = '{reportData {reports(guildID:' + guildId + ',zoneID:' + zoneId + ',page:' + currentPage + ') {total, per_page, last_page, current_page, data {rankedCharacters { name }}}}}'
-        rosterData = await client.request(rosterQuery)
+        rosterData = await getCachedQuery(client, rosterQuery)
         for (const guildReport of rosterData.reportData.reports.data) {
           if (Array.isArray(guildReport.rankedCharacters) && guildReport.rankedCharacters.length > 0) {
             for (const guildPc of guildReport.rankedCharacters) {
@@ -277,6 +302,32 @@ async function getCharacterFullReport (charName, serverSlug, regionSlug, metric)
   }
   return charEntry
 }
+
+async function getCachedQuery(client2, query) {
+  await mongoose.connect(MONGO_CONN_URL, {useNewUrlParser: true, useUnifiedTopology: true})
+  let cachedQueries = await CachedQuery.find({queryString: query});
+  let data = '';
+  let blnFound = false;
+  for (let cachedQuery of cachedQueries) {
+    //console.log(`CachedQuery ${cachedQuery.queryString}`);
+    //console.log(`CachedData ${cachedQuery.queryData}`);
+    console.log(`CachedDate ${cachedQuery.queryDate}`);
+    let nowDate = new Date();
+    cacheAge =  nowDate.getTime() - cachedQuery.queryDate.getTime();
+    console.log(`CacheAge ${(cacheAge / 1000)}s`);
+    if (((cacheAge / 1000) / 3600) < 6) {
+      data = cachedQuery.get('queryData');
+      blnFound = true;
+    }
+  }
+  if (!blnFound) {
+    data = await client2.request(query)
+    const cachedQuery = new CachedQuery({queryString: query, queryData: data, queryDate: Date.now()});
+    cachedQuery.save().then(() => console.log(`saved ${query}`));
+  }
+  return data;
+}
+
 const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, charName) => {
   return new Promise(async (resolve, reject) => {
     const bossName = statics.getBossMap().get(encounterId)
@@ -292,7 +343,7 @@ const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, c
       const partitions = [-1]
       for (const partition of partitions) {
         const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ',partition:' + partition + ', metric:' + metric + ')}}}'
-        const data = await client2.request(query)
+        const data = await getCachedQuery(client2, query)
         console.log(`OK getCharacterEncounterLog: ${partition}`)
         console.log(`Color: ${statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))}`)
 
@@ -334,7 +385,7 @@ const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, c
       }
 
       const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ',partition:-1, metric:' + metric + ')}}}'
-      const data = await client2.request(query)
+      const data = await getCachedQuery(client2, query)
       if (data.characterData.character.encounterRankings.averagePerformance != null) {
         avgRank = data.characterData.character.encounterRankings.averagePerformance
       }
@@ -382,6 +433,7 @@ const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, c
     }
   })
 }
+
 const getCharacterReport = (serverSlug, regionSlug, charName, metric, encounterId) => {
   return new Promise(async (resolve, reject) => {
     const bossName = statics.getBossMap().get(encounterId)
@@ -390,16 +442,15 @@ const getCharacterReport = (serverSlug, regionSlug, charName, metric, encounterI
       const rankRanks = []
       const rawData = []
       const partitions = [-1]
-      for (const partition of partitions) {
 
-          const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ', partition:' + partition + ', metric:' + metric + ')}}}'
+
+          const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ', partition:-1, metric:' + metric + ')}}}'
           const client2 = new GraphQLClient(endpoint, {
             headers: {
               authorization: 'Bearer ' + WCL_TOKEN
             }
           })
-        const data = await client2.request(query)
-        console.log(`OK getCharacterReport: ${partition}`)
+        const data = await getCachedQuery(client2, query)
         console.log(`Color: ${statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))}`)
         for (const rank of data.characterData.character.encounterRankings.ranks) {
           const date = new Date(rank.startTime).toISOString().substr(0, 10)
@@ -422,7 +473,6 @@ const getCharacterReport = (serverSlug, regionSlug, charName, metric, encounterI
           dpsRanks.push(rank.amount)
           rankRanks.push(rank.rankPercent)
         }
-      }
 
 
       dpsRanks.sort(function (a, b) {

@@ -38,7 +38,6 @@
             </select>
             <br/>
             Report Type: <select name="encounterId">
-                <!--<option value="All">All Encounters (SLOW)</option>-->
                 <% encounters.forEach(function(value, key) { %>
                     <option value="<%=key %>"><%=value %></option>
                 <% }); %>
