@@ -258,7 +258,6 @@ async function getCharacterEncounterReportAll (guildList, serverSlug, regionSlug
   })
   return returnArr
 }
-
 async function getCharacterFullReport (charName, serverSlug, regionSlug, metric) {
   const charEncounters = new Map()
   const boundFunc = getCharacterReport.bind(null, serverSlug, regionSlug, charName, metric)
@@ -282,40 +281,43 @@ const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, c
   return new Promise(async (resolve, reject) => {
     const bossName = statics.getBossMap().get(encounterId)
     try {
-      const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ', metric:' + metric + ')}}}'
+      const dpsRanks = []
+      const rankRanks = []
+      const rawData = []
       const client2 = new GraphQLClient(endpoint, {
         headers: {
           authorization: 'Bearer ' + WCL_TOKEN
         }
       })
-      const data = await client2.request(query)
-      console.log('OK here goes...')
-      console.log(`Color: ${statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))}`)
-      const dpsRanks = []
-      const rankRanks = []
-      const rawData = []
-      for (const rank of data.characterData.character.encounterRankings.ranks) {
-        const date = new Date(rank.startTime).toISOString().substr(0, 10)
-        const duration = new Date(rank.duration * 1000).toISOString().substr(11, 8)
-        const rawEntry = {
-          name: data.characterData.character.name,
-          bossName: bossName,
-          bossId: encounterId,
-          guildName: rank.guild.name,
-          date: date,
-          dps: rank.amount,
-          duration: duration,
-          pct: rank.rankPercent,
-          todayPct: rank.todayPercent,
-          spec: rank.spec,
-          className: statics.getClassMap().get(data.characterData.character.classID),
-          classColor: statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))
-        }
-        rawData.push(rawEntry)
-        dpsRanks.push(rank.amount)
-        rankRanks.push(rank.rankPercent)
-      }
+      const partitions = [-1]
+      for (const partition of partitions) {
+        const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ',partition:' + partition + ', metric:' + metric + ')}}}'
+        const data = await client2.request(query)
+        console.log(`OK getCharacterEncounterLog: ${partition}`)
+        console.log(`Color: ${statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))}`)
 
+        for (const rank of data.characterData.character.encounterRankings.ranks) {
+          const date = new Date(rank.startTime).toISOString().substr(0, 10)
+          const duration = new Date(rank.duration * 1000).toISOString().substr(11, 8)
+          const rawEntry = {
+            name: data.characterData.character.name,
+            bossName: bossName,
+            bossId: encounterId,
+            guildName: rank.guild.name,
+            date: date,
+            dps: rank.amount,
+            duration: duration,
+            pct: rank.rankPercent,
+            todayPct: rank.todayPercent,
+            spec: rank.spec,
+            className: statics.getClassMap().get(data.characterData.character.classID),
+            classColor: statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))
+          }
+          rawData.push(rawEntry)
+          dpsRanks.push(rank.amount)
+          rankRanks.push(rank.rankPercent)
+        }
+      }
       dpsRanks.sort(function (a, b) {
         return b - a
       })
@@ -330,6 +332,9 @@ const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, c
       if (rankRanks.length > 0) {
         bestRank = rankRanks[0]
       }
+
+      const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ',partition:-1, metric:' + metric + ')}}}'
+      const data = await client2.request(query)
       if (data.characterData.character.encounterRankings.averagePerformance != null) {
         avgRank = data.characterData.character.encounterRankings.averagePerformance
       }
@@ -381,39 +386,44 @@ const getCharacterReport = (serverSlug, regionSlug, charName, metric, encounterI
   return new Promise(async (resolve, reject) => {
     const bossName = statics.getBossMap().get(encounterId)
     try {
-      const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ', metric:' + metric + ')}}}'
-      const client2 = new GraphQLClient(endpoint, {
-        headers: {
-          authorization: 'Bearer ' + WCL_TOKEN
-        }
-      })
-      const data = await client2.request(query)
-      console.log('OK here goes...')
-      console.log(`Color: ${statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))}`)
       const dpsRanks = []
       const rankRanks = []
       const rawData = []
-      for (const rank of data.characterData.character.encounterRankings.ranks) {
-        const date = new Date(rank.startTime).toISOString().substr(0, 10)
-        const duration = new Date(rank.duration * 1000).toISOString().substr(11, 8)
-        const rawEntry = {
-          name: data.characterData.character.name,
-          bossName: bossName,
-          bossId: encounterId,
-          guildName: rank.guild.name,
-          date: date,
-          dps: rank.amount,
-          duration: duration,
-          pct: rank.rankPercent,
-          todayPct: rank.todayPercent,
-          spec: rank.spec,
-          className: statics.getClassMap().get(data.characterData.character.classID),
-          classColor: statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))
+      const partitions = [-1]
+      for (const partition of partitions) {
+
+          const query = '{characterData {character(name:"' + charName + '",serverSlug:"' + serverSlug + '",serverRegion:"' + regionSlug + '") { name, classID, encounterRankings(encounterID:' + encounterId + ', partition:' + partition + ', metric:' + metric + ')}}}'
+          const client2 = new GraphQLClient(endpoint, {
+            headers: {
+              authorization: 'Bearer ' + WCL_TOKEN
+            }
+          })
+        const data = await client2.request(query)
+        console.log(`OK getCharacterReport: ${partition}`)
+        console.log(`Color: ${statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))}`)
+        for (const rank of data.characterData.character.encounterRankings.ranks) {
+          const date = new Date(rank.startTime).toISOString().substr(0, 10)
+          const duration = new Date(rank.duration * 1000).toISOString().substr(11, 8)
+          const rawEntry = {
+            name: data.characterData.character.name,
+            bossName: bossName,
+            bossId: encounterId,
+            guildName: rank.guild.name,
+            date: date,
+            dps: rank.amount,
+            duration: duration,
+            pct: rank.rankPercent,
+            todayPct: rank.todayPercent,
+            spec: rank.spec,
+            className: statics.getClassMap().get(data.characterData.character.classID),
+            classColor: statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))
+          }
+          rawData.push(rawEntry)
+          dpsRanks.push(rank.amount)
+          rankRanks.push(rank.rankPercent)
         }
-        rawData.push(rawEntry)
-        dpsRanks.push(rank.amount)
-        rankRanks.push(rank.rankPercent)
       }
+
 
       dpsRanks.sort(function (a, b) {
         return b - a
