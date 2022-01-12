@@ -42,7 +42,7 @@
                 </button>
             </p>
         </div>
-        <div class="col-auto">
+        <div class="col-lg">
             <% if (failedChars.length > 0) { %>
                 <div class="alert alert-danger" role="alert">
                     The following characters could not be loaded and need to be Updated on Warcraft Logs:<br/>
@@ -70,16 +70,22 @@
                         <option value="HKMG" selected>High King Maulgar</option>
                         <option value="GRUL">Gruul the Dragonkiller</option>
                         <option value="MAGT">Magtheridon</option>
-                        <option value="ATTN">Attumen the Huntsman</option>
-                        <option value="MORS">Moroes</option>
-                        <option value="MAID">Maiden of Virtue</option>
-                        <option value="OPRA">Opera Hall</option>
-                        <option value="CURA">The Curator</option>
-                        <option value="ILHF">Terestian Illhoof</option>
-                        <option value="ARAN">Shade of Aran</option>
-                        <option value="NSPT">Netherspite</option>
-                        <option value="PRNC">Prince Malchezaar</option>
-                        <option value="NTBN">Nightbane</option>
+                        <option value="HYDR">Hydross</option>
+                        <option value="LURK">Lurker</option>
+                        <option value="LEOT">Leotheras</option>
+                        <option value="FATH">Fathom-Lord</option>
+                        <option value="MORO">Morogrim</option>
+                        <option value="VASH">Vashj</option>
+                        <option value="ALAR">Alar</option>
+                        <option value="VOID">Void Reaver</option>
+                        <option value="SOLA">Solarian</option>
+                        <option value="KAEL">Kaelthas</option>
+                    </select>
+                    Classes <select id="classFilter" name="classFilter">
+                        <option value="ALL" selected>ALL</option>
+                        <% classes.forEach(function(value, key) { %>
+                        <option value="<%=value %>"><%=value %></option>
+                        <% }); %>
                     </select>
                 </form>
             </div>
@@ -121,35 +127,35 @@
                         <th style="" data-field="MAGT_BEST" data-sortable="true">
                             <div class="th-inner ">MAGT</div>
                         </th>
-                        <th style="" data-field="ATTN_BEST" data-sortable="true">
-                            <div class="th-inner ">ATTN</div>
+                        <th style="" data-field="HYDR_BEST" data-sortable="true">
+                            <div class="th-inner ">HYDR</div>
                         </th>
-                        <th style="" data-field="MORS_BEST" data-sortable="true">
-                            <div class="th-inner ">MORS</div>
+                        <th style="" data-field="LURK_BEST" data-sortable="true">
+                            <div class="th-inner ">LURK</div>
                         </th>
-                        <th style="" data-field="MAID_BEST" data-sortable="true">
-                            <div class="th-inner ">MAID</div>
+                        <th style="" data-field="LEOT_BEST" data-sortable="true">
+                            <div class="th-inner ">LEOT</div>
                         </th>
-                        <th style="" data-field="OPRA_BEST" data-sortable="true">
-                            <div class="th-inner ">OPRA</div>
+                        <th style="" data-field="FATH_BEST" data-sortable="true">
+                            <div class="th-inner ">FATH</div>
                         </th>
-                        <th style="" data-field="CURA_BEST" data-sortable="true">
-                            <div class="th-inner ">CURA</div>
+                        <th style="" data-field="MORO_BEST" data-sortable="true">
+                            <div class="th-inner ">MORO</div>
                         </th>
-                        <th style="" data-field="ILHF_BEST" data-sortable="true">
-                            <div class="th-inner ">ILHF</div>
+                        <th style="" data-field="VASH_BEST" data-sortable="true">
+                            <div class="th-inner ">VASH</div>
                         </th>
-                        <th style="" data-field="ARAN_BEST" data-sortable="true">
-                            <div class="th-inner ">ARAN</div>
+                        <th style="" data-field="ALAR_BEST" data-sortable="true">
+                            <div class="th-inner ">ALAR</div>
                         </th>
-                        <th style="" data-field="NSPT_BEST" data-sortable="true">
-                            <div class="th-inner ">NSPT</div>
+                        <th style="" data-field="SOLA_BEST" data-sortable="true">
+                            <div class="th-inner ">SOLA</div>
                         </th>
-                        <th style="" data-field="PRNC_BEST" data-sortable="true">
-                            <div class="th-inner ">PRNC</div>
+                        <th style="" data-field="VOID_BEST" data-sortable="true">
+                            <div class="th-inner ">VOID</div>
                         </th>
-                        <th style="" data-field="NTBN_BEST" data-sortable="true">
-                            <div class="th-inner ">NTBN</div>
+                        <th style="" data-field="KAEL_BEST" data-sortable="true">
+                            <div class="th-inner ">KAEL</div>
                         </th>
                     </tr>
                     </thead>
@@ -234,8 +240,10 @@
         let dataMap = new Map();
         let colorMap = new Map();
         for (let dataEntry of rawData) {
-            dataMap.set(dataEntry.name, eval('dataEntry.' + $('#graphEncounter').val() + '_' + $('#pageMetric').val()))
-            colorMap.set(dataEntry.name, dataEntry.classColor ?? '#FF0000')
+            if ($('#classFilter').val() == 'ALL' || $('#classFilter').val() == dataEntry.className  ) {
+                dataMap.set(dataEntry.name, eval('dataEntry.' + $('#graphEncounter').val() + '_' + $('#pageMetric').val()))
+                colorMap.set(dataEntry.name, dataEntry.classColor ?? '#FF0000')
+            }
         }
         let sortedMap = new Map([...dataMap.entries()].sort((a, b) => b[1] - a[1]))
         for (let key of sortedMap.keys()) {
@@ -309,35 +317,35 @@
                 field: 'MAGT_' + $('#pageMetric').val(),
                 title: 'MAGT'
             }, {
-                field: 'ATTN_' + $('#pageMetric').val(),
-                title: 'ATTN'
+                field: 'HYDR_' + $('#pageMetric').val(),
+                title: 'HYDR'
             }, {
-                field: 'MORS_' + $('#pageMetric').val(),
-                title: 'MORS'
+                field: 'LURK_' + $('#pageMetric').val(),
+                title: 'LURK'
             }, {
-                field: 'MAID_' + $('#pageMetric').val(),
-                title: 'MAID'
+                field: 'LEOT_' + $('#pageMetric').val(),
+                title: 'LEOT'
             }, {
-                field: 'OPRA_' + $('#pageMetric').val(),
-                title: 'OPRA'
+                field: 'FATH_' + $('#pageMetric').val(),
+                title: 'FATH'
             }, {
-                field: 'CURA_' + $('#pageMetric').val(),
-                title: 'CURA'
+                field: 'MORO_' + $('#pageMetric').val(),
+                title: 'MORO'
             }, {
-                field: 'ILHF_' + $('#pageMetric').val(),
-                title: 'ILHF'
+                field: 'VASH_' + $('#pageMetric').val(),
+                title: 'VASH'
             }, {
-                field: 'ARAN_' + $('#pageMetric').val(),
-                title: 'ARAN'
+                field: 'ALAR_' + $('#pageMetric').val(),
+                title: 'ALAR'
             }, {
-                field: 'NSPT_' + $('#pageMetric').val(),
-                title: 'NSPT'
+                field: 'SOLA_' + $('#pageMetric').val(),
+                title: 'SOLA'
             }, {
-                field: 'PRNC_' + $('#pageMetric').val(),
-                title: 'PRNC'
+                field: 'VOID_' + $('#pageMetric').val(),
+                title: 'VOID'
             }, {
-                field: 'NTBN_' + $('#pageMetric').val(),
-                title: 'NTBN'
+                field: 'KAEL_' + $('#pageMetric').val(),
+                title: 'KAEL'
             }]
         })
         //$('#table2').bootstrapTable('load', mydata2)
@@ -376,6 +384,11 @@
         });
 
         $('#graphEncounter').change(function () {
+            let graphData = prepData(mydata2)
+            buildGraph(graphData);
+        });
+
+        $('#classFilter').change(function () {
             let graphData = prepData(mydata2)
             buildGraph(graphData);
         });

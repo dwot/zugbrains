@@ -149,17 +149,21 @@ app.post('/encounter-report', async function (req, res) {
           // AllBest, AllAvg, All3, All5
           const charEncounters = charReport.charEncounters
           let charClass = ''
-          for (const bossId of statics.getBossMap().keys()) {
+          let charSpec = ''
+          for (const bossId of statics.getBossMap25().keys()) {
             const entry = charEncounters.get(bossId)
             for (const rawEntry of entry.rawData) {
               preparedData.push(rawEntry)
             }
             charClass = entry.className
+            charSpec = entry.spec
           }
+          console.log(`CHAR: ${charName} (${charClass} : ${charSpec})`)
           if (charClass !== 'Phantom') {
               const characterEntry = {
                 name: charName,
                 className: charClass,
+                specName: charSpec,
                 classColor: statics.getColorMap().get(charClass),
                 // HKMG
                 HKMG_BEST: charEncounters.get(649).bestDps,
@@ -176,6 +180,7 @@ app.post('/encounter-report', async function (req, res) {
                 MAGT_AVG: charEncounters.get(651).avgDps,
                 MAGT_AVG5: charEncounters.get(651).avgDps5,
                 MAGT_AVG3: charEncounters.get(651).avgDps3,
+                /*
                 // ATTN
                 ATTN_BEST: charEncounters.get(652).bestDps,
                 ATTN_AVG: charEncounters.get(652).avgDps,
@@ -226,7 +231,57 @@ app.post('/encounter-report', async function (req, res) {
                 NTBN_AVG: charEncounters.get(662).avgDps,
                 NTBN_AVG5: charEncounters.get(662).avgDps5,
                 NTBN_AVG3: charEncounters.get(662).avgDps3,
-
+                */
+                // HYDR
+                HYDR_BEST: charEncounters.get(623).bestDps,
+                HYDR_AVG: charEncounters.get(623).avgDps,
+                HYDR_AVG5: charEncounters.get(623).avgDps5,
+                HYDR_AVG3: charEncounters.get(623).avgDps3,
+                // LURK
+                LURK_BEST: charEncounters.get(624).bestDps,
+                LURK_AVG: charEncounters.get(624).avgDps,
+                LURK_AVG5: charEncounters.get(624).avgDps5,
+                LURK_AVG3: charEncounters.get(624).avgDps3,
+                // LEOT
+                LEOT_BEST: charEncounters.get(625).bestDps,
+                LEOT_AVG: charEncounters.get(625).avgDps,
+                LEOT_AVG5: charEncounters.get(625).avgDps5,
+                LEOT_AVG3: charEncounters.get(625).avgDps3,
+                // FATH
+                FATH_BEST: charEncounters.get(626).bestDps,
+                FATH_AVG: charEncounters.get(626).avgDps,
+                FATH_AVG5: charEncounters.get(626).avgDps5,
+                FATH_AVG3: charEncounters.get(626).avgDps3,
+                // MORO
+                MORO_BEST: charEncounters.get(627).bestDps,
+                MORO_AVG: charEncounters.get(627).avgDps,
+                MORO_AVG5: charEncounters.get(627).avgDps5,
+                MORO_AVG3: charEncounters.get(627).avgDps3,
+                // VASH
+                VASH_BEST: charEncounters.get(628).bestDps,
+                VASH_AVG: charEncounters.get(628).avgDps,
+                VASH_AVG5: charEncounters.get(628).avgDps5,
+                VASH_AVG3: charEncounters.get(628).avgDps3,
+                // ALAR
+                ALAR_BEST: charEncounters.get(730).bestDps,
+                ALAR_AVG: charEncounters.get(730).avgDps,
+                ALAR_AVG5: charEncounters.get(730).avgDps5,
+                ALAR_AVG3: charEncounters.get(730).avgDps3,
+                // SOLA
+                SOLA_BEST: charEncounters.get(732).bestDps,
+                SOLA_AVG: charEncounters.get(732).avgDps,
+                SOLA_AVG5: charEncounters.get(732).avgDps5,
+                SOLA_AVG3: charEncounters.get(732).avgDps3,
+                // VOID
+                VOID_BEST: charEncounters.get(731).bestDps,
+                VOID_AVG: charEncounters.get(731).avgDps,
+                VOID_AVG5: charEncounters.get(731).avgDps5,
+                VOID_AVG3: charEncounters.get(731).avgDps3,
+                // KAEL
+                KAEL_BEST: charEncounters.get(733).bestDps,
+                KAEL_AVG: charEncounters.get(733).avgDps,
+                KAEL_AVG5: charEncounters.get(733).avgDps5,
+                KAEL_AVG3: charEncounters.get(733).avgDps3,
                 bossEntry: charEncounters
               }
               analyzedData.push(characterEntry)
@@ -253,7 +308,9 @@ app.post('/encounter-report', async function (req, res) {
       reportData: preparedData,
       analyzedData: analyzedData,
       failedChars: failedChars,
-      reportType: reportType
+      reportType: reportType,
+      classes: statics.getClassMap(),
+      specs: statics.getSpecMap()
     })
   } catch (error) {
     console.error(error)
@@ -321,12 +378,30 @@ async function getCachedQuery(client2, query) {
     }
   }
   if (!blnFound) {
-    data = await client2.request(query)
-    const cachedQuery = new CachedQuery({queryString: query, queryData: data, queryDate: Date.now()});
-    cachedQuery.save().then(() => console.log(`saved ${query}`));
+    let tries = 0
+    while ( tries < 30) {
+      try {
+        tries++;
+        data = await client2.request(query)
+        const cachedQuery = new CachedQuery({queryString: query, queryData: data, queryDate: Date.now()});
+        cachedQuery.save().then(() => console.log(`saved ${query}`));
+        tries = 99;
+      } catch (error) {
+        if (JSON.stringify(error, undefined, 2).indexOf('Too Many Requests') >= 0) {
+          console.error("TOO MANY REQUESTS")
+          await new Promise(resolve => setTimeout(resolve, 30000));
+        } else {
+          console.error(JSON.stringify(error, undefined, 2))
+          tries = 666;
+        }
+      }
+    }
+
   }
   return data;
 }
+
+
 
 const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, charName) => {
   return new Promise(async (resolve, reject) => {
@@ -346,6 +421,7 @@ const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, c
         const data = await getCachedQuery(client2, query)
         console.log(`OK getCharacterEncounterLog: ${partition}`)
         console.log(`Color: ${statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))}`)
+        let classColor = statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))
 
         for (const rank of data.characterData.character.encounterRankings.ranks) {
           const date = new Date(rank.startTime).toISOString().substr(0, 10)
@@ -362,7 +438,7 @@ const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, c
             todayPct: rank.todayPercent,
             spec: rank.spec,
             className: statics.getClassMap().get(data.characterData.character.classID),
-            classColor: statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))
+            classColor: classColor
           }
           rawData.push(rawEntry)
           dpsRanks.push(rank.amount)
@@ -452,6 +528,7 @@ const getCharacterReport = (serverSlug, regionSlug, charName, metric, encounterI
           })
         const data = await getCachedQuery(client2, query)
         console.log(`Color: ${statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))}`)
+        let classColor = statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))
         for (const rank of data.characterData.character.encounterRankings.ranks) {
           const date = new Date(rank.startTime).toISOString().substr(0, 10)
           const duration = new Date(rank.duration * 1000).toISOString().substr(11, 8)
@@ -467,7 +544,7 @@ const getCharacterReport = (serverSlug, regionSlug, charName, metric, encounterI
             todayPct: rank.todayPercent,
             spec: rank.spec,
             className: statics.getClassMap().get(data.characterData.character.classID),
-            classColor: statics.getColorMap().get(statics.getClassMap().get(data.characterData.character.classID))
+            classColor: classColor
           }
           rawData.push(rawEntry)
           dpsRanks.push(rank.amount)

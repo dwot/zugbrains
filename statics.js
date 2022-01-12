@@ -23,6 +23,21 @@ ENCOUNTER_MAP.set(659, 'Netherspite')
 ENCOUNTER_MAP.set(661, 'Prince Malchezaar')
 ENCOUNTER_MAP.set(662, 'Nightbane')
 
+const ENCOUNTER_MAP25 = new Map()
+ENCOUNTER_MAP25.set(649, 'High King Maulgar')
+ENCOUNTER_MAP25.set(650, 'Gruul the Dragonkiller')
+ENCOUNTER_MAP25.set(651, 'Magtheridon')
+ENCOUNTER_MAP25.set(623, 'Hydross')
+ENCOUNTER_MAP25.set(624, 'Lurker')
+ENCOUNTER_MAP25.set(625, 'Leotheras')
+ENCOUNTER_MAP25.set(626, 'Fathom-Lord')
+ENCOUNTER_MAP25.set(627, 'Morogrim')
+ENCOUNTER_MAP25.set(628, 'Vashj')
+ENCOUNTER_MAP25.set(730, 'Alar')
+ENCOUNTER_MAP25.set(731, 'Void Reaver')
+ENCOUNTER_MAP25.set(732, 'Solarian')
+ENCOUNTER_MAP25.set(733, 'Kaelthas')
+
 const ZONE_MAP = new Map()
 ZONE_MAP.set(649, 1008)
 ZONE_MAP.set(650, 1008)
@@ -60,6 +75,42 @@ CLASS_MAP.set(9, 'Shaman')
 CLASS_MAP.set(10, 'Warlock')
 CLASS_MAP.set(11, 'Warrior')
 
+const SPEC_MAP = new Map()
+SPEC_MAP.set('AfflictionWarlock','affliction_warlock.jpg')
+SPEC_MAP.set('ArcaneMage','arcane_mage.jpg')
+SPEC_MAP.set('ArmsWarrior','arms_warrior.jpg')
+SPEC_MAP.set('AssassinationRogue','assassination_rogue.jpg')
+SPEC_MAP.set('BalanceDruid','balance_druid.jpg')
+SPEC_MAP.set('BeastMasteryHunter','beast_mastery_hunter.jpg')
+SPEC_MAP.set('CombatRogue','combat_rogue.jpg')
+SPEC_MAP.set('DemonologyWarlock','demonology_warlock.jpg')
+SPEC_MAP.set('DestructionWarlock','destruction_warlock.jpg')
+SPEC_MAP.set('DisciplinePriest','discipline_priest.jpg')
+SPEC_MAP.set('ElementalShaman','elemental_shaman.jpg')
+SPEC_MAP.set('EnhancementShaman','enhancement_shaman.jpg')
+SPEC_MAP.set('FeralDruid','feral_druid.jpg')
+SPEC_MAP.set('FireMage','fire_mage.jpg')
+SPEC_MAP.set('FrostMage','frost_mage.jpg')
+SPEC_MAP.set('FuryWarrior','fury_warrior.jpg')
+SPEC_MAP.set('HolyPaladin','holy_paladin.jpg')
+SPEC_MAP.set('HolyPriest','holy_priest.jpg')
+SPEC_MAP.set('MarksmanshipHunter','marksmanship_hunter.jpg')
+SPEC_MAP.set('ProtectionPaladin','protection_paladin.jpg')
+SPEC_MAP.set('ProtectionWarrior','protection_warrior.jpg')
+SPEC_MAP.set('RestorationDruid','restoration_druid.jpg')
+SPEC_MAP.set('RestorationShaman','restoration_shaman.jpg')
+SPEC_MAP.set('RetributionPaladin','retribution_paladin.jpg')
+SPEC_MAP.set('ShadowPriest','shadow_priest.jpg')
+SPEC_MAP.set('SubtletyRogue','subtlety_rogue.jpg')
+SPEC_MAP.set('SurvivalHunter','survival_hunter.jpg')
+
+
+
+
+
+
+
+
 const COLOR_MAP = new Map()
 COLOR_MAP.set('Druid', '#FF7D0A')
 COLOR_MAP.set('Hunter', '#ABD473')
@@ -84,8 +135,10 @@ staticVars.getServersUs = function getServersUs () { return US_SERVERS.sort() }
 staticVars.getServersEu = function getServersEu () { return EU_SERVERS.sort() }
 staticVars.getZoneMap = function getZoneMap () { return ZONE_MAP }
 staticVars.getBossMap = function getBossMap () { return ENCOUNTER_MAP }
+staticVars.getBossMap25 = function getBossMap25 () { return ENCOUNTER_MAP25 }
 staticVars.getClassMap = function getClassMap () { return CLASS_MAP }
 staticVars.getZoneNameMap = function getZoneNameMap () { return ZONE_NAME_MAP }
 staticVars.getColorMap = function getColorMap () { return COLOR_MAP }
+staticVars.getSpecMap = function getSpecMap() { return SPEC_MAP }
 
 module.exports = staticVars

@@ -41,6 +41,7 @@
                 <% encounters.forEach(function(value, key) { %>
                     <option value="<%=key %>"><%=value %></option>
                 <% }); %>
+                <option value="All">All Encounters (Slow, Waits for Rate Limit)</option>
             </select> <br />
             <input type="submit" />
         </form>
