@@ -3,7 +3,6 @@ const secrets = require('./secrets')
 const statics = require('./statics')
 const express = require('express')
 const mongoose = require('mongoose');
-var faker = require("faker");
 
 const app = express()
 app.set('view engine', 'ejs')
@@ -13,7 +12,6 @@ const MONGO_CONN_URL = (secrets.read('MONGO_CONN_URL') || process.env.MONGO_CONN
 var thingSchema = new mongoose.Schema({queryString: String, queryDate: Date }, { strict: false })
 const port = process.env.PORT || 3000
 const endpoint = 'https://classic.warcraftlogs.com/api/v2/client'
-const Cat = mongoose.model('Cat', { name: String })
 const CachedQuery = mongoose.model('CachedQuery', thingSchema)
 
 const client = new GraphQLClient(endpoint, {

@@ -19,6 +19,11 @@
                 </div>
             </div>
         <% } %>
+        ZugBrains.RIP is a collection of tools for manipulating data from WarcraftLogs for WoW TBC Classic, built and maintained by dwot of &lt;propane&gt; on Benediction.
+        <hr>
+        <h3>Encounter Report</h3>
+        <h5>This report allows you to pull Average / Best DPS for a guild for a particular fight.<br> Select all encounter report (last item in the list) for a breakdown of this data across all 25 man bosses.  This view also has a bar graph.  Results are cached for performance and will only repull every few hours.</h5>
+        <br>
         <form action="/encounter-report" method="post">
 
             Guild Name: <input name="guildName" type="text"/> <br/>
@@ -45,6 +50,24 @@
             </select> <br />
             <input type="submit" />
         </form>
+        <br>
+        <hr>
+        <h3>Last Parse Overlay</h3>
+        <h5>Builds a simple webpage that updates every 30s displaying the last parse logged for a character on WarcraftLogs.  Just create a browser source in OBS and put in the URL along w/ appropriate character, server, region and hps/dps metric.</h5>
+        <pre>https://zugbrains.rip/overlayLastParse?c=CHAR_NAME_HERE&s=SERVER_NAME_HERE&r=REGION_NAME_HERE&m=DPS_OR_HPS_HERE</pre>
+            <h5>Samples:</h5>
+        <ul>
+            <li><a href="https://zugbrains.rip/overlayLastParse?c=dwot&s=Benediction&r=US&m=dps">https://zugbrains.rip/overlayLastParse?c=dwot&s=Benediction&r=US&m=dps</a></li>
+            <li><a href="https://zugbrains.rip/overlayLastParse?c=angelotl&s=Benediction&r=US&m=dps">https://zugbrains.rip/overlayLastParse?c=angelotl&s=Benediction&r=US&m=dps</a></li>
+            <li><a href="https://zugbrains.rip/overlayLastParse?c=angelop&s=Benediction&r=US&m=hps">https://zugbrains.rip/overlayLastParse?c=angelop&s=Benediction&r=US&m=hps</a></li>
+            <li><a href="https://zugbrains.rip/overlayLastParse?c=freshcoffee&s=Benediction&r=US&m=dps">https://zugbrains.rip/overlayLastParse?c=freshcoffee&s=Benediction&r=US&m=dps</a></li>
+        </ul>
+        <hr>
+        <h3>Source</h3>
+        <h5><a href="https://github.com/dwot/zugbrains">https://github.com/dwot/zugbrains</a></h5>
+        <hr>
+        <h3>Twitch</h3>
+        <h5><a href="https://www.twitch.tv/dwotTV">https://www.twitch.tv/dwotTV</a></h5>
     </div>
 </main>
 <script>
