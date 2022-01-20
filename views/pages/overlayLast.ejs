@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta http-equiv="refresh" content="30"/>
+            <style>body {
+                font-family: Avenir, Arial, sans-serif;
+            }
+
+                #overlay {
+                    position: fixed;
+                    display: block;
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0, 0, 0, 0.1);
+                    z-index: 2;
+                    cursor: pointer;
+                }
+
+                #text {
+                    position: absolute;
+                    font-size: 25px;
+                    color: white;
+                }
+
+                .artifact {
+                    color: #e5cc80 !important
+                }
+
+                .legendary {
+                    color: #ff8000 !important
+                }
+
+                .astounding {
+                    color: #e268a8 !important
+                }
+
+                .magnificent {
+                    color: #be8200 !important
+                }
+
+                .epic {
+                    color: #a335ee !important
+                }
+
+                .rare {
+                    color: #0070ff !important
+                }
+
+                .uncommon {
+                    color: #1eff00 !important
+                }
+
+                .common {
+                    color: #666 !important
+                }</style>
+    </head>
+    <body>
+        <div id="overlay">
+            <div id="text">
+                <table bgcolor="#333" cellpadding="2" cellspacing="5">
+                    <tr>
+                        <td colspan="4" align="center">Last Fight<br><b><%=encounter%></b></td>
+                    </tr>
+                    <tr>
+                        <td align="center">Time</td>
+                        <td align="center">DPS</td>
+                        <td align="center">Parse</td>
+                        <td align="center">Rank</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><%=duration%>s</td>
+                        <td align="center"><%=dps%></td>
+                        <td align="center" class="<%=parseColor%>"><%=parse%></td>
+                        <td align="center"><%=rank%></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

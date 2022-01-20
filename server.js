@@ -25,20 +25,63 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('views/static'))
 
-app.get('/dbtest', async function (req, res) {
-  let numbers = []
-  var randomName = faker.name.findName();
-  mongoose.connect(MONGO_CONN_URL, {useNewUrlParser: true, useUnifiedTopology: true});
-  const kitty = new Cat({ name: randomName });
-  kitty.save().then(() => console.log(`meow ${randomName}`));
-  const kittens = await Cat.find();
-  for (let kitty of kittens) {
-    console.log(`CAT ${kitty.name}`);
+app.get('/overlayLastParse', async function (req, res) {
+  const charName = req.query.c
+  const serverName = req.query.s
+  const serverRegion = req.query.r
+  const charQuery = `{characterData {character(name:"${charName}",serverSlug:"${serverName}",serverRegion:"${serverRegion}") {id, name, recentReports(limit:1) {total, per_page, last_page, current_page, data {title, rankings}}}}}`
+  const charData = await client.request(charQuery)
+  let blnFound = false
+  let lastFight = null
+  let encounter = ''
+  let duration = 0
+  let dps = 0
+  let parse = 0
+  let rank = ''
+  while (blnFound == false) {
+    lastFight = charData.characterData.character.recentReports.data[0].rankings.data.pop()
+    if (lastFight.fightID < 1000 || charData.characterData.character.recentReports.data[0].rankings.data.length == 0) {
+      console.log(`RESULT ${lastFight.encounter.name} DUR: ${lastFight.duration} `)
+      for (let entry of lastFight.roles.dps.characters) {
+        if (entry.name.toLowerCase() == charName.toLowerCase()) {
+          console.log(`Found Ya! DPS: ${entry.amount} Parse: ${entry.rankPercent} Rank: ${entry.rank}`)
+          dps = entry.amount
+          parse = entry.rankPercent
+          rank = entry.rank
+          encounter = lastFight.encounter.name
+          duration = lastFight.duration / 1000
+          blnFound = true
+        }
+      }
+    }
   }
 
-  res.render('pages/dbtest', {
-    title: 'dbtest',
-    numbers: []
+
+  let parseColor = 'common'
+  if (parse == 100) {
+    parseColor = 'artifact'
+  } else if (parse == 99) {
+    parseColor = 'astounding'
+  } else if (parse >= 95) {
+    parseColor = 'legendary'
+  } else if (parse >= 75) {
+    parseColor = 'epic'
+  } else if (parse >= 50) {
+    parseColor = 'rare'
+  } else if (parse >= 25) {
+    parseColor = 'uncommon'
+  } else {
+    parseColor = 'common'
+  }
+
+  res.render('pages/overlayLast', {
+    title: 'overlayLastParse',
+    encounter: encounter,
+    duration: Math.round(duration),
+    dps: Math.round(dps),
+    parse: parse,
+    rank: rank,
+    parseColor: parseColor
   })
 });
 
@@ -52,15 +95,6 @@ app.get('/', function (req, res) {
   })
 })
 
-app.get('/static', function (req, res) {
-  res.sendFile('static.html', { root: __dirname })
-})
-// index page
-app.get('/ejs-test', function (req, res) {
-  res.render('pages/index', {
-    title: 'Sample Rendered Page'
-  })
-})
 
 app.post('/encounter-report', async function (req, res) {
   try {
@@ -359,7 +393,6 @@ async function getCharacterFullReport (charName, serverSlug, regionSlug, metric)
   }
   return charEntry
 }
-
 async function getCachedQuery(client2, query) {
   await mongoose.connect(MONGO_CONN_URL, {useNewUrlParser: true, useUnifiedTopology: true})
   let cachedQueries = await CachedQuery.find({queryString: query});
@@ -400,9 +433,6 @@ async function getCachedQuery(client2, query) {
   }
   return data;
 }
-
-
-
 const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, charName) => {
   return new Promise(async (resolve, reject) => {
     const bossName = statics.getBossMap().get(encounterId)
@@ -509,7 +539,6 @@ const getCharacterEncounterLog = (serverSlug, regionSlug, encounterId, metric, c
     }
   })
 }
-
 const getCharacterReport = (serverSlug, regionSlug, charName, metric, encounterId) => {
   return new Promise(async (resolve, reject) => {
     const bossName = statics.getBossMap().get(encounterId)
