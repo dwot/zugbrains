@@ -44,7 +44,7 @@
         </ul>
         <hr>
         <h3>Encounter Report</h3>
-        <h5>This report allows you to pull Average / Best DPS for a guild for a particular fight.<br> Select all encounter report (last item in the list) for a breakdown of this data across all 25 man bosses.  This view also has a bar graph.  Results are cached for performance and will only repull every few hours.</h5>
+        <h5>This report allows you to pull Average / Best DPS for a guild for a particular fight.<br> Results are cached for performance and will only repull every few hours.</h5>
         <br>
         <form action="/encounter-report" method="post">
 
@@ -68,7 +68,6 @@
                 <% encounters.forEach(function(value, key) { %>
                     <option value="<%=key %>"><%=value %></option>
                 <% }); %>
-                <option value="All">All Encounters (Slow, Waits for Rate Limit)</option>
             </select> <br />
             <input type="submit" />
         </form>
