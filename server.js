@@ -141,6 +141,121 @@ app.get('/overlayLastParse', async function (req, res) {
 
 });
 
+app.get('/overlayReport', async function (req, res) {
+  const charName = req.query.c
+  const reportCode = req.query.r
+  const reqMetric = req.query.m
+  const reportRankings = []
+  let message = ''
+  if (charName === undefined || reportCode === undefined || reqMetric === undefined || charName == null ||
+      charName == '' || reportCode == null || reportCode == '' || reqMetric == null || reqMetric == '') {
+    message = 'Please pass the required fields'
+    res.render('pages/error', {
+      title: 'error',
+      message: message
+    })
+  } else {
+    const metric = reqMetric.toLowerCase()
+    const reportQuery = `{  reportData {    report(code:"${reportCode}") {      code, title, startTime, endTime, table(startTime: 0,endTime: 9999999999999, dataType: Deaths), rankings(playerMetric:${metric})    }  }}`
+    const reportData = await client.request(reportQuery)
+
+    //Iterate All Fights
+    for (let ranking of reportData.reportData.report.rankings.data) {
+      let blnFound = false
+      let blnSkip = false
+      let encounter = ''
+      let duration = 0
+      let dps = 0
+      let parse = 0
+      let rank = ''
+      let parseColor = 'common'
+      console.log(`RESULT ${ranking.encounter.name} DUR: ${ranking.duration} `)
+      while (blnFound == false) {
+            if (metric == 'dps') {
+              for (let entry of ranking.roles.dps.characters) {
+                if (entry.name.toLowerCase() == charName.toLowerCase()) {
+                  console.log(`Found Ya! DPS: ${entry.amount} Parse: ${entry.rankPercent} Rank: ${entry.rank}`)
+                  dps = entry.amount
+                  parse = entry.rankPercent
+                  rank = entry.rank
+                  encounter = ranking.encounter.name
+                  duration = ranking.duration / 1000
+                  blnFound = true
+                }
+              }
+            }
+            if (!blnFound) {
+              for (let entry of ranking.roles.tanks.characters) {
+                if (entry.name.toLowerCase() == charName.toLowerCase()) {
+                  console.log(`Found Ya! Tank: ${entry.amount} Parse: ${entry.rankPercent} Rank: ${entry.rank}`)
+                  dps = entry.amount
+                  parse = entry.rankPercent
+                  rank = entry.rank
+                  encounter = ranking.encounter.name
+                  duration = ranking.duration / 1000
+                  blnFound = true
+                }
+              }
+            }
+
+            if (!blnFound) {
+              for (let entry of ranking.roles.healers.characters) {
+                if (entry.name.toLowerCase() == charName.toLowerCase()) {
+                  console.log(`Found Ya! Heal: ${entry.amount} Parse: ${entry.rankPercent} Rank: ${entry.rank}`)
+                  dps = entry.amount
+                  parse = entry.rankPercent
+                  rank = entry.rank
+                  encounter = ranking.encounter.name
+                  duration = ranking.duration / 1000
+                  blnFound = true
+                }
+              }
+            }
+
+            if (!blnFound) {
+              blnFound = true
+              blnSkip = true
+            }
+
+          }
+          if (parse == 100) {
+            parseColor = 'artifact'
+          } else if (parse == 99) {
+            parseColor = 'astounding'
+          } else if (parse >= 95) {
+            parseColor = 'legendary'
+          } else if (parse >= 75) {
+            parseColor = 'epic'
+          } else if (parse >= 50) {
+            parseColor = 'rare'
+          } else if (parse >= 25) {
+            parseColor = 'uncommon'
+          } else {
+            parseColor = 'common'
+          }
+          let entry = {encounter:encounter,duration:Math.round(duration),dps:Math.round(dps),parse:parse,rank:rank,parseColor:parseColor}
+          if (!blnSkip) reportRankings.push(entry)
+      }
+    }
+
+
+    let blnErr = false
+    if (blnErr) {
+      res.render('pages/error', {
+        title: 'error',
+        message: message
+      })
+    } else {
+
+
+      res.render('pages/overlayReport', {
+        title: 'overlayReport',
+        reportRankings: reportRankings,
+        metric:reqMetric.toUpperCase()
+      })
+    }
+});
+
 app.get('/', function (req, res) {
   res.render('pages/index', {
     title: '',
