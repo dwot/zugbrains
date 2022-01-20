@@ -29,60 +29,118 @@ app.get('/overlayLastParse', async function (req, res) {
   const charName = req.query.c
   const serverName = req.query.s
   const serverRegion = req.query.r
-  const charQuery = `{characterData {character(name:"${charName}",serverSlug:"${serverName}",serverRegion:"${serverRegion}") {id, name, recentReports(limit:1) {total, per_page, last_page, current_page, data {title, rankings}}}}}`
-  const charData = await client.request(charQuery)
-  let blnFound = false
-  let lastFight = null
-  let encounter = ''
-  let duration = 0
-  let dps = 0
-  let parse = 0
-  let rank = ''
-  while (blnFound == false) {
-    lastFight = charData.characterData.character.recentReports.data[0].rankings.data.pop()
-    if (lastFight.fightID < 1000 || charData.characterData.character.recentReports.data[0].rankings.data.length == 0) {
-      console.log(`RESULT ${lastFight.encounter.name} DUR: ${lastFight.duration} `)
-      for (let entry of lastFight.roles.dps.characters) {
-        if (entry.name.toLowerCase() == charName.toLowerCase()) {
-          console.log(`Found Ya! DPS: ${entry.amount} Parse: ${entry.rankPercent} Rank: ${entry.rank}`)
-          dps = entry.amount
-          parse = entry.rankPercent
-          rank = entry.rank
-          encounter = lastFight.encounter.name
-          duration = lastFight.duration / 1000
-          blnFound = true
-        }
+  const reqMetric = req.query.m
+  let message = ''
+  if (charName === undefined || serverName === undefined || serverRegion === undefined || reqMetric === undefined || charName == null ||
+      charName == '' ||serverName == null || serverName == ''|| serverRegion == null || serverRegion == '' || reqMetric == null || reqMetric == '') {
+    message = 'Please pass the required fields'
+    res.render('pages/error', {
+      title: 'error',
+      message: message
+    })
+  } else {
+    const metric = reqMetric.toLowerCase()
+    const charQuery = `{characterData {character(name:"${charName}",serverSlug:"${serverName}",serverRegion:"${serverRegion}") {id, name, recentReports(limit:1) {total, per_page, last_page, current_page, data {title, rankings(playerMetric:${metric})}}}}}`
+    const charData = await client.request(charQuery)
+    let blnFound = false
+    let lastFight = null
+    let encounter = ''
+    let duration = 0
+    let dps = 0
+    let parse = 0
+    let rank = ''
+    let blnErr = false
+    while (blnFound == false) {
+      lastFight = charData.characterData.character.recentReports.data[0].rankings.data.pop()
+      if (lastFight === undefined) {
+        message = 'No Parses found for metric, did you mean to hps or dps?'
+        blnFound = true
+        blnErr = true
+      } else {
+        if (lastFight.fightID < 1000 || charData.characterData.character.recentReports.data[0].rankings.data.length == 0) {
+          console.log(`RESULT ${lastFight.encounter.name} DUR: ${lastFight.duration} `)
+          if (metric == 'dps') {
+            for (let entry of lastFight.roles.dps.characters) {
+              if (entry.name.toLowerCase() == charName.toLowerCase()) {
+                console.log(`Found Ya! DPS: ${entry.amount} Parse: ${entry.rankPercent} Rank: ${entry.rank}`)
+                dps = entry.amount
+                parse = entry.rankPercent
+                rank = entry.rank
+                encounter = lastFight.encounter.name
+                duration = lastFight.duration / 1000
+                blnFound = true
+              }
+            }
+          }
+            if (!blnFound) {
+              for (let entry of lastFight.roles.tanks.characters) {
+                if (entry.name.toLowerCase() == charName.toLowerCase()) {
+                  console.log(`Found Ya! DPS: ${entry.amount} Parse: ${entry.rankPercent} Rank: ${entry.rank}`)
+                  dps = entry.amount
+                  parse = entry.rankPercent
+                  rank = entry.rank
+                  encounter = lastFight.encounter.name
+                  duration = lastFight.duration / 1000
+                  blnFound = true
+                }
+              }
+            }
+
+            if (!blnFound) {
+              for (let entry of lastFight.roles.healers.characters) {
+                if (entry.name.toLowerCase() == charName.toLowerCase()) {
+                  console.log(`Found Ya! DPS: ${entry.amount} Parse: ${entry.rankPercent} Rank: ${entry.rank}`)
+                  dps = entry.amount
+                  parse = entry.rankPercent
+                  rank = entry.rank
+                  encounter = lastFight.encounter.name
+                  duration = lastFight.duration / 1000
+                  blnFound = true
+                }
+              }
+            }
+
       }
+
+      }
+    }
+
+    if (blnErr) {
+      res.render('pages/error', {
+        title: 'error',
+        message: message
+      })
+    } else {
+      let parseColor = 'common'
+      if (parse == 100) {
+        parseColor = 'artifact'
+      } else if (parse == 99) {
+        parseColor = 'astounding'
+      } else if (parse >= 95) {
+        parseColor = 'legendary'
+      } else if (parse >= 75) {
+        parseColor = 'epic'
+      } else if (parse >= 50) {
+        parseColor = 'rare'
+      } else if (parse >= 25) {
+        parseColor = 'uncommon'
+      } else {
+        parseColor = 'common'
+      }
+
+      res.render('pages/overlayLast', {
+        title: 'overlayLastParse',
+        encounter: encounter,
+        duration: Math.round(duration),
+        dps: Math.round(dps),
+        parse: parse,
+        rank: rank,
+        parseColor: parseColor,
+        metric: metric.toUpperCase()
+      })
     }
   }
 
-
-  let parseColor = 'common'
-  if (parse == 100) {
-    parseColor = 'artifact'
-  } else if (parse == 99) {
-    parseColor = 'astounding'
-  } else if (parse >= 95) {
-    parseColor = 'legendary'
-  } else if (parse >= 75) {
-    parseColor = 'epic'
-  } else if (parse >= 50) {
-    parseColor = 'rare'
-  } else if (parse >= 25) {
-    parseColor = 'uncommon'
-  } else {
-    parseColor = 'common'
-  }
-
-  res.render('pages/overlayLast', {
-    title: 'overlayLastParse',
-    encounter: encounter,
-    duration: Math.round(duration),
-    dps: Math.round(dps),
-    parse: parse,
-    rank: rank,
-    parseColor: parseColor
-  })
 });
 
 app.get('/', function (req, res) {

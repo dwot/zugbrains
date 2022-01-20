@@ -2,7 +2,6 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-            <meta http-equiv="refresh" content="30"/>
             <style>body {
                 font-family: Avenir, Arial, sans-serif;
             }
@@ -64,19 +63,7 @@
             <div id="text">
                 <table bgcolor="#333" cellpadding="2" cellspacing="5">
                     <tr>
-                        <td colspan="4" align="center">Last Fight<br><b><%=encounter%></b></td>
-                    </tr>
-                    <tr>
-                        <td align="center">Time</td>
-                        <td align="center"><%=metric%></td>
-                        <td align="center">Parse</td>
-                        <td align="center">Rank</td>
-                    </tr>
-                    <tr>
-                        <td align="center"><%=duration%>s</td>
-                        <td align="center"><%=dps%></td>
-                        <td align="center" class="<%=parseColor%>"><%=parse%></td>
-                        <td align="center"><%=rank%></td>
+                        <td colspan="4" align="center"><b><%=message%></b></td>
                     </tr>
                 </table>
             </div>
