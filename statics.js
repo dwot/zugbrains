@@ -22,6 +22,21 @@ ENCOUNTER_MAP.set(658, 'Shade of Aran')
 ENCOUNTER_MAP.set(659, 'Netherspite')
 ENCOUNTER_MAP.set(661, 'Prince Malchezaar')
 ENCOUNTER_MAP.set(662, 'Nightbane')
+//BT+Hyjal
+ENCOUNTER_MAP.set(601, 'High Warlord Najentus')
+ENCOUNTER_MAP.set(602, 'Supremus')
+ENCOUNTER_MAP.set(603, 'Shade of Akama')
+ENCOUNTER_MAP.set(604, 'Teron Gorefiend')
+ENCOUNTER_MAP.set(605, 'Gurtogg Bloodboil')
+ENCOUNTER_MAP.set(606, 'Reliquary of Souls')
+ENCOUNTER_MAP.set(607, 'Mother Shahraz')
+ENCOUNTER_MAP.set(608, 'The Illidari Council')
+ENCOUNTER_MAP.set(609, 'Illidan Stormrage')
+ENCOUNTER_MAP.set(618, 'Rage Winterchill')
+ENCOUNTER_MAP.set(619, 'Anetheron')
+ENCOUNTER_MAP.set(620, 'Kazrogal')
+ENCOUNTER_MAP.set(621, 'Azgalor')
+ENCOUNTER_MAP.set(622, 'Archimonde')
 
 const ENCOUNTER_MAP25 = new Map()
 ENCOUNTER_MAP25.set(649, 'High King Maulgar')
@@ -37,6 +52,21 @@ ENCOUNTER_MAP25.set(730, 'Alar')
 ENCOUNTER_MAP25.set(731, 'Void Reaver')
 ENCOUNTER_MAP25.set(732, 'Solarian')
 ENCOUNTER_MAP25.set(733, 'Kaelthas')
+//BT+Hyjal
+ENCOUNTER_MAP25.set(601, 'High Warlord Najentus')
+ENCOUNTER_MAP25.set(602, 'Supremus')
+ENCOUNTER_MAP25.set(603, 'Shade of Akama')
+ENCOUNTER_MAP25.set(604, 'Teron Gorefiend')
+ENCOUNTER_MAP25.set(605, 'Gurtogg Bloodboil')
+ENCOUNTER_MAP25.set(606, 'Reliquary of Souls')
+ENCOUNTER_MAP25.set(607, 'Mother Shahraz')
+ENCOUNTER_MAP25.set(608, 'The Illidari Council')
+ENCOUNTER_MAP25.set(609, 'Illidan Stormrage')
+ENCOUNTER_MAP25.set(618, 'Rage Winterchill')
+ENCOUNTER_MAP25.set(619, 'Anetheron')
+ENCOUNTER_MAP25.set(620, 'Kazrogal')
+ENCOUNTER_MAP25.set(621, 'Azgalor')
+ENCOUNTER_MAP25.set(622, 'Archimonde')
 
 const ZONE_MAP = new Map()
 ZONE_MAP.set(649, 1008)
@@ -62,6 +92,21 @@ ZONE_MAP.set(730, 1010)
 ZONE_MAP.set(731, 1010)
 ZONE_MAP.set(732, 1010)
 ZONE_MAP.set(733, 1010)
+//BT+Hyjal
+ZONE_MAP.set(601, 1011)
+ZONE_MAP.set(602, 1011)
+ZONE_MAP.set(603, 1011)
+ZONE_MAP.set(604, 1011)
+ZONE_MAP.set(605, 1011)
+ZONE_MAP.set(606, 1011)
+ZONE_MAP.set(607, 1011)
+ZONE_MAP.set(608, 1011)
+ZONE_MAP.set(609, 1011)
+ZONE_MAP.set(618, 1011)
+ZONE_MAP.set(619, 1011)
+ZONE_MAP.set(620, 1011)
+ZONE_MAP.set(621, 1011)
+ZONE_MAP.set(622, 1011)
 
 
 const CLASS_MAP = new Map()
@@ -104,13 +149,6 @@ SPEC_MAP.set('ShadowPriest','shadow_priest.jpg')
 SPEC_MAP.set('SubtletyRogue','subtlety_rogue.jpg')
 SPEC_MAP.set('SurvivalHunter','survival_hunter.jpg')
 
-
-
-
-
-
-
-
 const COLOR_MAP = new Map()
 COLOR_MAP.set('Druid', '#FF7D0A')
 COLOR_MAP.set('Hunter', '#ABD473')
@@ -126,6 +164,7 @@ const ZONE_NAME_MAP = new Map()
 ZONE_NAME_MAP.set(1007, 'Kara')
 ZONE_NAME_MAP.set(1008, 'GruulMag')
 ZONE_NAME_MAP.set(1010, 'SSC+TK')
+ZONE_NAME_MAP.set(1011, 'BT+Hyjal')
 
 const US_SERVERS = ['atiesh', 'arugal', 'bloodsail-buccaneers', 'faerlina', 'fairbanks', 'grobbulus', 'herod', 'mankrik', 'myzrael', 'pagle', 'remulos', 'thalnos', 'whitemane', 'stalagg', 'blaumeux', 'skeram', 'incendius', 'bigglesworth', 'old-blanchy', 'westfall', 'kurinnaxx', 'kromcrush', 'deviate-delight', 'smolderweb', 'sulfuras', 'ashkandi', 'kirtonos', 'rattlegore', 'felstriker', 'yojamba', 'thunderfury', 'benediction', 'azuresong', 'windseeker', 'anathema', 'netherwind', 'earthfury', 'heartseeker', 'arcanite-reaper', 'loatheb', 'sulthraze']
 const EU_SERVERS = ['golemagg', 'hydraxian-waterlords', 'mirage-raceway', 'pyrewood-village', 'shazzrah', 'zandalar-tribe', 'auberdine', 'sulfuron', 'everlook', 'lucifron', 'chromie', 'flamegor', 'gehennas', 'firemaw', 'flamelash', 'gandling', 'mograine', 'nethergarde-keep', 'razorgore', 'stonespine', 'noggenfogger', 'amnennar', 'ashbringer', 'dreadmist', 'skullflame', 'ten-storms', 'dragons-call', 'lakeshire', 'transcendence', 'finkle', 'bloodfang', 'judgement', 'earthshaker', 'venoxis', 'wyrmthalak', 'rhokdelar', 'razorfen', 'patchwerk', 'heartstriker', 'mandokir', 'harbinger-of-doom', 'dragonfang', 'celebras']
