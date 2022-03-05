@@ -378,7 +378,8 @@ app.post('/trash-report', async function (req, res) {
         avgDps5: avgDps5,
         bestDps: bestDps,
         totalRanks: totalRanks,
-        deaths: totalDeaths
+        deaths: totalDeaths,
+        deathsPerRaid: (totalDeaths / totalRanks).toFixed(2)
 
       }
       processedEntries.push(processedEntry)
