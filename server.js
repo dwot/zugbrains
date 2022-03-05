@@ -266,6 +266,122 @@ app.get('/', function (req, res) {
   })
 })
 
+app.post('/trash-report', async function (req, res) {
+  try {
+    const submittedCodes = req.body.reportCode.split(',');
+    let reportView = 'pages/trash-report'
+    let reportTitle = 'ZugBrains Report'
+
+    const rawData = []
+    const entryMap = new Map()
+    for (const reportCode of submittedCodes) {
+
+      const reportQuery = '{reportData {report(code:"' + reportCode + '") {code, title, table(dataType: DamageDone, killType:Trash, startTime:0, endTime:99999999999999)}}}'
+      const reportData = await getCachedQuery(client, reportQuery)
+
+      const logTitle = reportData.reportData.report.title
+      const startTime = reportData.reportData.report.startTime
+      const totalTime = reportData.reportData.report.table.data.totalTime
+
+      for (const entries of reportData.reportData.report.table.data.entries) {
+        console.log(`Loop Rsult ${entries.name}:${entries.total}`)
+        const rawEntry = {
+          name: entries.name,
+          total: entries.total,
+          code: reportCode,
+          totalTime: totalTime,
+          logTitle: logTitle,
+          logDate: new Date(startTime).toLocaleDateString("en-US"),
+          spec: entries.icon,
+          className: entries.type,
+          classColor: statics.getColorMap().get(entries.type)
+        }
+        rawData.push(rawEntry)
+        if (entryMap.has(entries.name)) {
+          let charEntries = entryMap.get(entries.name)
+          charEntries.push(rawEntry)
+          entryMap.set(entries.name, charEntries)
+        } else {
+          let charEntries = []
+          charEntries.push(rawEntry)
+          entryMap.set(entries.name, charEntries)
+        }
+      }
+    }
+
+    const processedEntries = []
+    for (const playerName of entryMap.keys()) {
+      let entryValue = entryMap.get(playerName)
+      let className = ''
+      let classColor = ''
+      let spec = ''
+      const dpsValues = []
+      console.log(`Loop Entries ${playerName}:${entryValue.length}`)
+      //Iterate entryValues
+      for (const entry of entryValue) {
+        spec = entry.spec
+        classColor = entry.classColor
+        className = entry.className
+        let trashTime = entry.totalTime
+        let dmgDone = entry.total
+        let dps = dmgDone / trashTime
+        dpsValues.push(dps)
+      }
+      dpsValues.sort(function (a, b) {
+        return b - a
+      })
+      let avgDps = 0
+      let avgDps3 = 0
+      let avgDps5 = 0
+      let bestDps = 0
+      let totalRanks = dpsValues.length
+      if (dpsValues.length > 0) {
+        bestDps = (dpsValues[0] * 1000).toFixed(2)
+      }
+      if (dpsValues.length > 0) {
+        avgDps = (getAvg(dpsValues) * 1000).toFixed(2)
+        dpsValues.length = Math.min(dpsValues.length, 5)
+        avgDps5 = (getAvg(dpsValues) * 1000).toFixed(2)
+        dpsValues.length = Math.min(dpsValues.length, 3)
+        avgDps3 = (getAvg(dpsValues) * 1000).toFixed(2)
+      }
+
+
+      const processedEntry = {
+        name: playerName,
+        className: className,
+        classColor: classColor,
+        spec: spec,
+        avgDps: avgDps,
+        avgDps3: avgDps3,
+        avgDps5: avgDps5,
+        bestDps: bestDps,
+        totalRanks: totalRanks
+
+      }
+      processedEntries.push(processedEntry)
+    }
+
+    res.render(reportView, {
+      title: reportTitle,
+      reportCode: submittedCodes,
+      classes: statics.getClassMap(),
+      specs: statics.getSpecMap(),
+      analyzedData: processedEntries
+    })
+  } catch (error) {
+    console.error(error)
+    res.render('pages/index', {
+      title: '',
+      encounters: statics.getBossMap(),
+      usServers: statics.getServersUs(),
+      euServers: statics.getServersEu(),
+      errorText: 'Oops, something went wrong.'
+    })
+    // expected output: ReferenceError: nonExistentFunction is not defined
+    // Note - error messages will vary depending on browser
+  }
+})
 
 app.post('/encounter-report', async function (req, res) {
   try {
@@ -564,6 +680,7 @@ async function getCharacterFullReport (charName, serverSlug, regionSlug, metric)
   }
   return charEntry
 }
+
 async function getCachedQuery(client2, query) {
   await mongoose.connect(MONGO_CONN_URL, {useNewUrlParser: true, useUnifiedTopology: true})
   let cachedQueries = await CachedQuery.find({queryString: query});

@@ -72,7 +72,14 @@
             <input type="submit" />
         </form>
         <br>
-
+        <hr>
+        <h3>Trash Report</h3>
+        <h5>This report allows you to pull Average / Best DPS for a trash fights during raids for a particular set of warcraftlogs reports.  Enter a comma seperated list of report codes.<br> Results are cached for performance and will only repull every few hours.</h5>
+        <br>
+        <form action="/trash-report" method="post">
+        Report Code: <input name="reportCode" type="text"/> <br/>
+            <input type="submit" />
+        </form>
         <hr>
         <h3>Source</h3>
         <h5><a href="https://github.com/dwot/zugbrains">https://github.com/dwot/zugbrains</a></h5>

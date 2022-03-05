@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+</head>
+<body>
+
+<div class="container-fluid">
+    <%- include('../partials/header'); %>
+    <div class="row">
+        <div class="col-auto">
+            <table class="table table-dark table-striped table-bordered">
+                <tr>
+                    <th scope="row">ReportCode:</th>
+                    <td>&lt;<%= reportCode %>&gt;</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="col-auto">
+
+            <div id="toolbar2" class="select">
+                <select class="form-control">
+                    <option value="">Export Basic</option>
+                    <option value="all">Export All</option>
+                    <option value="selected">Export Selected</option>
+                </select>
+            </div>
+            <table id="table2" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar2"
+                   data-show-toggle="true" data-show-columns="true"
+                   data-filter-control="true"
+                   class="table table-bordered table-hover table-dark table-striped table-responsive ">
+
+                <thead class="">
+                    <tr>
+                        <th style="" data-field="name" data-filter-control="input" data-sortable="true">
+                            <div class="th-inner ">Name</div>
+                        </th>
+                        <th style="" data-field="className" data-filter-control="select" data-sortable="true">
+                            <div class="th-inner ">Class</div>
+                        </th>
+                        <th style="" data-field="spec" data-filter-control="select" data-sortable="true">
+                            <div class="th-inner ">Spec</div>
+                        </th>
+                        <th style="" data-field="totalRanks" data-sortable="true">
+                            <div class="th-inner ">Raids</div>
+                        </th>
+                        <th style="" data-field="bestDps" data-sortable="true">
+                            <div class="th-inner ">Best DPS</div>
+                        </th>
+                        <th style="" data-field="avgDps3" data-sortable="true">
+                            <div class="th-inner ">Top 3 Avg</div>
+                        </th>
+                        <th style="" data-field="avgDps5" data-sortable="true">
+                            <div class="th-inner ">Top 5 Avg</div>
+                        </th>
+                        <th style="" data-field="avgDps" data-sortable="true">
+                            <div class="th-inner ">Avg Dps</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+    <script>
+        var $table2 = $('#table2')
+
+        $(function () {
+            $('#toolbar2').find('select').change(function () {
+                    $table2.bootstrapTable({
+                        exportDataType: $(this).val(),
+                        exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
+                        data: mydata2
+                    })
+                }).trigger('change')
+        })
+
+        var mydata2 = <%- JSON.stringify(analyzedData) %>
+    </script>
+
+<%- include('../partials/footer'); %>
+</body>
+</html>
