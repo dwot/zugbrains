@@ -273,7 +273,9 @@ app.post('/trash-report', async function (req, res) {
     let reportTitle = 'ZugBrains Report'
 
     const rawData = []
+    const deathData = []
     const entryMap = new Map()
+    const deathMap = new Map()
     for (const reportCode of submittedCodes) {
 
       const reportQuery = '{reportData {report(code:"' + reportCode + '") {code, title, table(dataType: DamageDone, killType:Trash, startTime:0, endTime:99999999999999)}}}'
@@ -307,6 +309,24 @@ app.post('/trash-report', async function (req, res) {
           entryMap.set(entries.name, charEntries)
         }
       }
+
+      const deathQuery = '{reportData {report(code:"' + reportCode + '") {code, title, table(dataType: Deaths, startTime:0, endTime:99999999999999)}}}'
+      const deathData = await getCachedQuery(client, deathQuery)
+
+      for (const entries of deathData.reportData.report.table.data.entries) {
+        //console.log(`DeathLoop ${entries.name}`)
+        if (deathMap.has(entries.name)) {
+          let deathEntries = deathMap.get(entries.name)
+          deathEntries = deathEntries +1
+          deathMap.set(entries.name, deathEntries)
+          //console.log(`EXIST: ${entries.name}: ${deathEntries}`)
+        } else {
+          let deathEntries = 1
+          deathMap.set(entries.name, deathEntries)
+          //console.log(`NEW  : ${entries.name}: ${deathEntries}`)
+        }
+      }
+
     }
 
     const processedEntries = []
@@ -345,7 +365,8 @@ app.post('/trash-report', async function (req, res) {
         dpsValues.length = Math.min(dpsValues.length, 3)
         avgDps3 = (getAvg(dpsValues) * 1000).toFixed(2)
       }
-
+      let totalDeaths = 0
+      if (deathMap.has(playerName)) totalDeaths = deathMap.get(playerName)
 
       const processedEntry = {
         name: playerName,
@@ -356,7 +377,8 @@ app.post('/trash-report', async function (req, res) {
         avgDps3: avgDps3,
         avgDps5: avgDps5,
         bestDps: bestDps,
-        totalRanks: totalRanks
+        totalRanks: totalRanks,
+        deaths: totalDeaths
 
       }
       processedEntries.push(processedEntry)
