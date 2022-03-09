@@ -324,8 +324,12 @@ app.all('/trash-report', async function (req, res) {
         //console.log(`DeathLoop ${entries.name}`)
         if (deathMap.has(entries.name)) {
           let deathEntries = deathMap.get(entries.name)
-          deathEntries = deathEntries +1
-          deathMap.set(entries.name, deathEntries)
+          if (entries.damage.total > 0) {
+            deathEntries = deathEntries + 1
+            deathMap.set(entries.name, deathEntries)
+          } else {
+            console.log(`Skipped Death for no Damage: ${entries.name}`)
+          }
           //console.log(`EXIST: ${entries.name}: ${deathEntries}`)
         } else {
           let deathEntries = 1
