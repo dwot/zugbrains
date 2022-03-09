@@ -293,7 +293,7 @@ app.all('/trash-report', async function (req, res) {
       const totalTime = reportData.reportData.report.table.data.totalTime
 
       for (const entries of reportData.reportData.report.table.data.entries) {
-        console.log(`Loop Rsult ${entries.name}:${entries.total}`)
+        //console.log(`Loop Rsult ${entries.name}:${entries.total}`)
         const rawEntry = {
           name: entries.name,
           total: entries.total,
@@ -347,7 +347,6 @@ app.all('/trash-report', async function (req, res) {
       let classColor = ''
       let spec = ''
       const dpsValues = []
-      console.log(`Loop Entries ${playerName}:${entryValue.length}`)
       //Iterate entryValues
       for (const entry of entryValue) {
         spec = entry.spec
@@ -356,7 +355,8 @@ app.all('/trash-report', async function (req, res) {
         let trashTime = entry.totalTime
         let dmgDone = entry.total
         let dps = dmgDone / trashTime
-        dpsValues.push(dps)
+        //console.log(`ENTRY ${playerName}:${dps} (${dmgDone}) - ${entry.code}`)
+        if (dps > 0.150 || className != 'Rogue') dpsValues.push(dps)
       }
       dpsValues.sort(function (a, b) {
         return b - a
@@ -365,7 +365,7 @@ app.all('/trash-report', async function (req, res) {
       let avgDps3 = 0
       let avgDps5 = 0
       let bestDps = 0
-      let totalRanks = dpsValues.length
+      let totalRanks = entryMap.get(playerName).length
       if (dpsValues.length > 0) {
         bestDps = (dpsValues[0] * 1000).toFixed(2)
       }
@@ -391,9 +391,8 @@ app.all('/trash-report', async function (req, res) {
         totalRanks: totalRanks,
         deaths: totalDeaths,
         deathsPerRaid: (totalDeaths / totalRanks).toFixed(2)
-
       }
-      processedEntries.push(processedEntry)
+      if (processedEntry.className != 'Pet' && processedEntry.className != 'Unknown') processedEntries.push(processedEntry)
     }
 
     res.render(reportView, {
