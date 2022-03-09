@@ -266,9 +266,16 @@ app.get('/', function (req, res) {
   })
 })
 
-app.post('/trash-report', async function (req, res) {
+app.all('/trash-report', async function (req, res) {
   try {
-    const submittedCodes = req.body.reportCode.split(',');
+    let reportCodes = ''
+    let linkSet = []
+    if (req.body.reportCode != null && req.body.reportCode != '') {
+      reportCodes = req.body.reportCode
+    } else {
+      reportCodes = req.query.c
+    }
+    const submittedCodes = reportCodes.split(',');
     let reportView = 'pages/trash-report'
     let reportTitle = 'ZugBrains Report'
 
@@ -277,7 +284,7 @@ app.post('/trash-report', async function (req, res) {
     const entryMap = new Map()
     const deathMap = new Map()
     for (const reportCode of submittedCodes) {
-
+      linkSet.push(`https://classic.warcraftlogs.com/reports/${reportCode}/`)
       const reportQuery = '{reportData {report(code:"' + reportCode + '") {code, title, table(dataType: DamageDone, killType:Trash, startTime:0, endTime:99999999999999)}}}'
       const reportData = await getCachedQuery(client, reportQuery)
 
@@ -390,7 +397,8 @@ app.post('/trash-report', async function (req, res) {
       reportCode: submittedCodes,
       classes: statics.getClassMap(),
       specs: statics.getSpecMap(),
-      analyzedData: processedEntries
+      analyzedData: processedEntries,
+      reportLinks: linkSet
     })
   } catch (error) {
     console.error(error)
