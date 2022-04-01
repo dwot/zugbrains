@@ -269,28 +269,40 @@ app.get('/', function (req, res) {
 app.all('/trash-report', async function (req, res) {
   try {
     let reportCodes = ''
+    let style = ''
     let linkSet = []
     if (req.body.reportCode != null && req.body.reportCode != '') {
       reportCodes = req.body.reportCode
     } else {
       reportCodes = req.query.c
     }
+    if (req.body.style != null && req.body.style != '') {
+      style = req.body.style
+    } else {
+      style = req.query.s
+    }
     const submittedCodes = reportCodes.split(',');
     let reportView = 'pages/trash-report'
+
     let reportTitle = 'ZugBrains Report'
 
     const rawData = []
     const deathData = []
+    const encounterData = []
     const entryMap = new Map()
     const deathMap = new Map()
+    const logWeeks = []
     for (const reportCode of submittedCodes) {
       linkSet.push(`https://classic.warcraftlogs.com/reports/${reportCode}/`)
-      const reportQuery = '{reportData {report(code:"' + reportCode + '") {code, title, table(dataType: DamageDone, killType:Trash, startTime:0, endTime:99999999999999)}}}'
+      const reportQuery = '{reportData {report(code:"' + reportCode + '") {code, title, startTime, table(dataType: DamageDone, killType:Trash, startTime:0, endTime:99999999999999)}}}'
       const reportData = await getCachedQuery(client, reportQuery)
 
       const logTitle = reportData.reportData.report.title
       const startTime = reportData.reportData.report.startTime
       const totalTime = reportData.reportData.report.table.data.totalTime
+      const logDate = new Date(startTime).toLocaleDateString("en-US")
+      const logWeek = getWeekFromDate(new Date(startTime))
+      logWeeks.push(logWeek)
 
       for (const entries of reportData.reportData.report.table.data.entries) {
         //console.log(`Loop Rsult ${entries.name}:${entries.total}`)
@@ -303,7 +315,8 @@ app.all('/trash-report', async function (req, res) {
           logDate: new Date(startTime).toLocaleDateString("en-US"),
           spec: entries.icon,
           className: entries.type,
-          classColor: statics.getColorMap().get(entries.type)
+          classColor: statics.getColorMap().get(entries.type),
+          entryType: 'Trash'
         }
         rawData.push(rawEntry)
         if (entryMap.has(entries.name)) {
@@ -338,43 +351,105 @@ app.all('/trash-report', async function (req, res) {
         }
       }
 
+      const encounterDmgQuery = '{reportData {report(code:"' + reportCode + '") {code, title, table(dataType: DamageDone, killType:Encounters, startTime:0, endTime:99999999999999)}}}'
+      const encounterData = await getCachedQuery(client, encounterDmgQuery)
+
+      for (const entries of encounterData.reportData.report.table.data.entries) {
+        const rawEntry = {
+          name: entries.name,
+          total: entries.total,
+          code: reportCode,
+          totalTime: totalTime,
+          logTitle: logTitle,
+          logDate: new Date(startTime).toLocaleDateString("en-US"),
+          spec: entries.icon,
+          className: entries.type,
+          classColor: statics.getColorMap().get(entries.type),
+          entryType: 'Encounters'
+        }
+
+        rawData.push(rawEntry)
+        if (entryMap.has(entries.name)) {
+          let charEntries = entryMap.get(entries.name)
+          charEntries.push(rawEntry)
+          entryMap.set(entries.name, charEntries)
+        } else {
+          let charEntries = []
+          charEntries.push(rawEntry)
+          entryMap.set(entries.name, charEntries)
+        }
+      }
+
     }
 
     const processedEntries = []
+    const weeklyEntries = []
     for (const playerName of entryMap.keys()) {
       let entryValue = entryMap.get(playerName)
       let className = ''
       let classColor = ''
       let spec = ''
-      const dpsValues = []
+      const trashValues = []
+      const encounterValues = []
+      const trashMap = new Map()
+      const encounterMap = new Map()      
+      
       //Iterate entryValues
       for (const entry of entryValue) {
-        spec = entry.spec
-        classColor = entry.classColor
-        className = entry.className
-        let trashTime = entry.totalTime
-        let dmgDone = entry.total
-        let dps = dmgDone / trashTime
-        //console.log(`ENTRY ${playerName}:${dps} (${dmgDone}) - ${entry.code}`)
-        if (dps > 0.150 || className != 'Rogue') dpsValues.push(dps)
+          
+          spec = entry.spec
+          classColor = entry.classColor
+          className = entry.className
+          let totalTime = entry.totalTime
+          let dmgDone = entry.total
+          let dps = dmgDone / totalTime
+          let logDate = entry.logDate
+        if (entry.entryType == 'Trash') {
+          //console.log(`ENTRY ${playerName}:${dps} (${dmgDone}) - ${entry.code}`)
+          if (dps > 0.150 || className != 'Rogue') {
+            trashMap.set(getWeekFromDate(new Date(logDate)), (dps * 1000).toFixed(2))
+            trashValues.push(dps)
+          }
+        } else {
+          encounterMap.set(getWeekFromDate(new Date(logDate)), (dps * 1000).toFixed(2))
+          encounterValues.push(dps)
+        }
       }
-      dpsValues.sort(function (a, b) {
+      trashValues.sort(function (a, b) {
         return b - a
       })
-      let avgDps = 0
-      let avgDps3 = 0
-      let avgDps5 = 0
-      let bestDps = 0
+      let trashDps = 0
+      let trashDps3 = 0
+      let trashDps5 = 0
+      let bestTrashDps = 0
       let totalRanks = entryMap.get(playerName).length
-      if (dpsValues.length > 0) {
-        bestDps = (dpsValues[0] * 1000).toFixed(2)
+      if (trashValues.length > 0) {
+        bestTrashDps = (trashValues[0] * 1000).toFixed(2)
       }
-      if (dpsValues.length > 0) {
-        avgDps = (getAvg(dpsValues) * 1000).toFixed(2)
-        dpsValues.length = Math.min(dpsValues.length, 5)
-        avgDps5 = (getAvg(dpsValues) * 1000).toFixed(2)
-        dpsValues.length = Math.min(dpsValues.length, 3)
-        avgDps3 = (getAvg(dpsValues) * 1000).toFixed(2)
+      if (trashValues.length > 0) {
+        trashDps = (getAvg(trashValues) * 1000).toFixed(2)
+        trashValues.length = Math.min(trashValues.length, 5)
+        trashDps5 = (getAvg(trashValues) * 1000).toFixed(2)
+        trashValues.length = Math.min(trashValues.length, 3)
+        trashDps3 = (getAvg(trashValues) * 1000).toFixed(2)
+      }
+
+      encounterValues.sort(function (a, b) {
+        return b - a
+      })
+      let encounterDps = 0
+      let encounterDps3 = 0
+      let encounterDps5 = 0
+      let bestEncounterDps = 0
+      if (encounterValues.length > 0) {
+        bestEncounterDps = (encounterValues[0] * 1000).toFixed(2)
+      }
+      if (encounterValues.length > 0) {
+        encounterDps = (getAvg(encounterValues) * 1000).toFixed(2)
+        encounterValues.length = Math.min(encounterValues.length, 5)
+        encounterDps5 = (getAvg(encounterValues) * 1000).toFixed(2)
+        encounterValues.length = Math.min(encounterValues.length, 3)
+        encounterDps3 = (getAvg(encounterValues) * 1000).toFixed(2)
       }
       let totalDeaths = 0
       if (deathMap.has(playerName)) totalDeaths = deathMap.get(playerName)
@@ -384,25 +459,34 @@ app.all('/trash-report', async function (req, res) {
         className: className,
         classColor: classColor,
         spec: spec,
-        avgDps: avgDps,
-        avgDps3: avgDps3,
-        avgDps5: avgDps5,
-        bestDps: bestDps,
+        trashDps: trashDps,
+        trashDps3: trashDps3,
+        trashDps5: trashDps5,
+        bestTrashDps: bestTrashDps,
+        encounterDps: encounterDps,
+        encounterDps3: encounterDps3,
+        encounterDps5: encounterDps5,
+        bestEncounterDps: bestEncounterDps,
         totalRanks: totalRanks,
         deaths: totalDeaths,
-        deathsPerRaid: (totalDeaths / totalRanks).toFixed(2)
+        deathsPerRaid: (totalDeaths / totalRanks).toFixed(2),
+        trashMap: trashMap,
+        encounterMap: encounterMap
       }
       if (processedEntry.className != 'Pet' && processedEntry.className != 'Unknown') processedEntries.push(processedEntry)
     }
 
-    res.render(reportView, {
-      title: reportTitle,
-      reportCode: submittedCodes,
-      classes: statics.getClassMap(),
-      specs: statics.getSpecMap(),
-      analyzedData: processedEntries,
-      reportLinks: linkSet
-    })
+    const distinctLogWeeks = [...new Set(logWeeks)]
+    if (style == 'Weekly') reportView = 'pages/weekly-report'
+      res.render(reportView, {
+        title: reportTitle,
+        reportCode: submittedCodes,
+        classes: statics.getClassMap(),
+        specs: statics.getSpecMap(),
+        analyzedData: processedEntries,
+        reportLinks: linkSet,
+        logWeeks: distinctLogWeeks
+      })
   } catch (error) {
     console.error(error)
     res.render('pages/index', {
@@ -684,6 +768,14 @@ app.post('/encounter-report', async function (req, res) {
 function getAvg (values) {
   const total = values.reduce((acc, c) => acc + c, 0)
   return total / values.length
+}
+
+function getWeekFromDate(inDate) {
+  console.log(inDate)
+  let startDate = new Date(inDate.getFullYear(), 0, 1)
+  let days = Math.floor((inDate - startDate) / (24 * 60 * 60 * 1000))
+
+  return Math.ceil((inDate.getDay() + 1 + days) / 7)
 }
 
 async function getCharacterEncounterReportAll (guildList, serverSlug, regionSlug, encounterId, metric) {

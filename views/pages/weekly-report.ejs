@@ -45,44 +45,26 @@
                         <th style="" data-field="className" data-filter-control="select" data-sortable="true">
                             <div class="th-inner ">Class</div>
                         </th>
-                        <th style="" data-field="spec" data-filter-control="select" data-sortable="true">
-                            <div class="th-inner ">Spec</div>
+                        <%for (week of logWeeks) {%>
+                        <th style="" data-field="wk<%=week%>EncounterDps" data-sortable="true">
+                            <div class="th-inner ">Week <%=week%> Boss</div>
                         </th>
-                        <th style="" data-field="deaths" data-sortable="true">
-                            <div class="th-inner ">Deaths</div>
+                        <th style="" data-field="wk<%=week%>TrashDps" data-sortable="true">
+                            <div class="th-inner ">Week <%=week%> Trash</div>
                         </th>
-                        <th style="" data-field="deathsPerRaid" data-sortable="true">
-                            <div class="th-inner ">DeathsPerRaid</div>
-                        </th>
-                        <th style="" data-field="totalRanks" data-sortable="true">
-                            <div class="th-inner ">Raids</div>
-                        </th>
-                        <th style="" data-field="bestTrashDps" data-sortable="true">
-                            <div class="th-inner ">Best Trash DPS</div>
-                        </th>
-                        <th style="" data-field="trashDps3" data-sortable="true">
-                            <div class="th-inner ">Top Trash 3 Avg</div>
-                        </th>
-                        <th style="" data-field="trashDps5" data-sortable="true">
-                            <div class="th-inner ">Top Trash 5 Avg</div>
-                        </th>
-                        <th style="" data-field="trashDps" data-sortable="true">
-                            <div class="th-inner ">Avg Trash Dps</div>
-                        </th>
-                        <th style="" data-field="bestEncounterDps" data-sortable="true">
-                            <div class="th-inner ">Best Encounter DPS</div>
-                        </th>
-                        <th style="" data-field="encounterDps3" data-sortable="true">
-                            <div class="th-inner ">Top Encounter 3 Avg</div>
-                        </th>
-                        <th style="" data-field="encounterDps5" data-sortable="true">
-                            <div class="th-inner ">Top Encounter 5 Avg</div>
-                        </th>
-                        <th style="" data-field="encounterDps" data-sortable="true">
-                            <div class="th-inner ">Avg Encounter Dps</div>
-                        </th>
+                        <%}%>
                     </tr>
                 </thead>
+                <%for (entry of analyzedData) {%>
+                    <tr>
+                        <td><%=entry.name%></td>
+                        <td><%=entry.className%></td>
+                        <%for (week of logWeeks) {%>
+                        <td><%=entry.encounterMap.get(week)%></td>
+                        <td><%=entry.trashMap.get(week)%></td>
+                        <%}%>
+                    </tr>
+                <%}%>
                 <tbody>
                 </tbody>
             </table>
@@ -97,12 +79,10 @@
                     $table2.bootstrapTable({
                         exportDataType: $(this).val(),
                         exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
-                        data: mydata2
                     })
                 }).trigger('change')
         })
 
-        var mydata2 = <%- JSON.stringify(analyzedData) %>
     </script>
 
 <%- include('../partials/footer'); %>
