@@ -356,11 +356,12 @@ app.all('/trash-report', async function (req, res) {
       const encounterData = await getCachedQuery(client, encounterDmgQuery)
 
       for (const entries of encounterData.reportData.report.table.data.entries) {
+        const encounterTime = encounterData.reportData.report.table.data.totalTime
         const rawEntry = {
           name: entries.name,
           total: entries.total,
           code: reportCode,
-          totalTime: totalTime,
+          totalTime: encounterTime,
           logTitle: logTitle,
           logDate: new Date(startTime).toLocaleDateString("en-US"),
           spec: entries.icon,
