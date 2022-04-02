@@ -271,6 +271,7 @@ app.all('/trash-report', async function (req, res) {
   try {
     let reportCodes = ''
     let style = ''
+    let metric = ''
     let linkSet = []
     if (req.body.reportCode != null && req.body.reportCode != '') {
       reportCodes = req.body.reportCode
@@ -282,6 +283,13 @@ app.all('/trash-report', async function (req, res) {
     } else {
       style = req.query.s
     }
+    if (req.body.metric != null && req.body.metric != '') {
+      metric = req.body.metric
+    } else {
+      metric = req.query.m
+    }
+    let metricCode = 'DamageDone'
+    if (metric == 'hps') metricCode = 'Healing'
     const submittedCodes = reportCodes.split(',');
     let reportView = 'pages/trash-report'
 
@@ -295,7 +303,8 @@ app.all('/trash-report', async function (req, res) {
     const logWeeks = []
     for (const reportCode of submittedCodes) {
       linkSet.push(`https://classic.warcraftlogs.com/reports/${reportCode}/`)
-      const reportQuery = '{reportData {report(code:"' + reportCode + '") {code, title, startTime, table(dataType: DamageDone, killType:Trash, startTime:0, endTime:99999999999999)}}}'
+
+      const reportQuery = '{reportData {report(code:"' + reportCode + '") {code, title, startTime, table(dataType:'+ metricCode +', killType:Trash, startTime:0, endTime:99999999999999)}}}'
       const reportData = await getCachedQuery(client, reportQuery)
 
       const logTitle = reportData.reportData.report.title
@@ -352,7 +361,7 @@ app.all('/trash-report', async function (req, res) {
         }
       }
 
-      const encounterDmgQuery = '{reportData {report(code:"' + reportCode + '") {code, title, table(dataType: DamageDone, killType:Encounters, startTime:0, endTime:99999999999999)}}}'
+      const encounterDmgQuery = '{reportData {report(code:"' + reportCode + '") {code, title, table(dataType:'+ metricCode +', killType:Encounters, startTime:0, endTime:99999999999999)}}}'
       const encounterData = await getCachedQuery(client, encounterDmgQuery)
 
       for (const entries of encounterData.reportData.report.table.data.entries) {
@@ -490,7 +499,8 @@ app.all('/trash-report', async function (req, res) {
         specs: statics.getSpecMap(),
         analyzedData: processedEntries,
         reportLinks: linkSet,
-        logWeeks: distinctLogWeeks
+        logWeeks: distinctLogWeeks,
+        metric: metric
       })
   } catch (error) {
     console.error(error)
