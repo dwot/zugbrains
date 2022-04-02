@@ -422,7 +422,7 @@ app.all('/trash-report', async function (req, res) {
             trashValues.push(dps)
           }
         } else {
-          if (dps > 0.350 || className != 'Rogue') {
+          if (dps > 0.600 || className != 'Rogue') {
             encounterMap.set(getWeekFromDate(new Date(logDate)), (dps * 1000).toFixed(2))
             encounterValues.push(dps)
           }
@@ -779,6 +779,8 @@ app.post('/encounter-report', async function (req, res) {
     // Note - error messages will vary depending on browser
   }
 })
+
+
 
 function getAvg (values) {
   const total = values.reduce((acc, c) => acc + c, 0)
