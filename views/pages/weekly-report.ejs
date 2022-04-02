@@ -55,17 +55,17 @@
                         <%}%>
                     </tr>
                 </thead>
-                <%for (entry of analyzedData) {%>
-                    <tr>
-                        <td><%=entry.name%></td>
-                        <td><%=entry.className%></td>
-                        <%for (week of logWeeks) {%>
-                        <td><%=entry.encounterMap.get(week)%></td>
-                        <td><%=entry.trashMap.get(week)%></td>
-                        <%}%>
-                    </tr>
-                <%}%>
                 <tbody>
+                <%for (entry of analyzedData) {%>
+                <tr>
+                    <td><%=entry.name%></td>
+                    <td><%=entry.className%></td>
+                    <%for (week of logWeeks) {%>
+                    <td><%=entry.encounterMap.get(week)%></td>
+                    <td><%=entry.trashMap.get(week)%></td>
+                    <%}%>
+                </tr>
+                <%}%>
                 </tbody>
             </table>
         </div>

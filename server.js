@@ -3,6 +3,7 @@ const secrets = require('./secrets')
 const statics = require('./statics')
 const express = require('express')
 const mongoose = require('mongoose');
+const getWeek = require('date-fns/getWeek')
 
 const app = express()
 app.set('view engine', 'ejs')
@@ -411,8 +412,10 @@ app.all('/trash-report', async function (req, res) {
             trashValues.push(dps)
           }
         } else {
-          encounterMap.set(getWeekFromDate(new Date(logDate)), (dps * 1000).toFixed(2))
-          encounterValues.push(dps)
+          if (dps > 0.350 || className != 'Rogue') {
+            encounterMap.set(getWeekFromDate(new Date(logDate)), (dps * 1000).toFixed(2))
+            encounterValues.push(dps)
+          }
         }
       }
       trashValues.sort(function (a, b) {
@@ -422,7 +425,8 @@ app.all('/trash-report', async function (req, res) {
       let trashDps3 = 0
       let trashDps5 = 0
       let bestTrashDps = 0
-      let totalRanks = entryMap.get(playerName).length
+      let totalRanks = trashValues.length
+      if (totalRanks == 0) totalRanks = 1
       if (trashValues.length > 0) {
         bestTrashDps = (trashValues[0] * 1000).toFixed(2)
       }
@@ -473,7 +477,7 @@ app.all('/trash-report', async function (req, res) {
         trashMap: trashMap,
         encounterMap: encounterMap
       }
-      if (processedEntry.className != 'Pet' && processedEntry.className != 'Unknown') processedEntries.push(processedEntry)
+      if (processedEntry.className != 'Pet' && processedEntry.className != 'Unknown' && processedEntry.className != 'NPC') processedEntries.push(processedEntry)
     }
 
     const distinctLogWeeks = [...new Set(logWeeks)]
@@ -771,11 +775,7 @@ function getAvg (values) {
 }
 
 function getWeekFromDate(inDate) {
-  console.log(inDate)
-  let startDate = new Date(inDate.getFullYear(), 0, 1)
-  let days = Math.floor((inDate - startDate) / (24 * 60 * 60 * 1000))
-
-  return Math.ceil((inDate.getDay() + 1 + days) / 7)
+  return getWeek(inDate)
 }
 
 async function getCharacterEncounterReportAll (guildList, serverSlug, regionSlug, encounterId, metric) {
