@@ -8,3 +8,6 @@ body {
 #toolbar {
     margin: 0;
 }
+#myChart {
+    width: 90%;
+}

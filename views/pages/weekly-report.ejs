@@ -8,7 +8,7 @@
 <div class="container-fluid">
     <%- include('../partials/header'); %>
     <div class="row">
-        <div class="col-auto">
+        <div class="col">
             <table class="table table-dark table-striped table-bordered">
                 <tr>
                     <th scope="row">Metric:</th>
@@ -27,8 +27,9 @@
             </table>
 
         </div>
-
-        <div class="col-auto">
+    </div>
+    <div class="row">
+        <div class="col px-md-5">
             <div class="alert alert-info" role="alert">
                 <form id="metricForm">
                     Showing <select id="pageMetric" name="pageMetric">
@@ -103,7 +104,9 @@
                     indx++
                     let dataMap = dataEntry.trashMap
                     if ($('#pageMetric').val() == 'BOSS') dataMap = dataEntry.encounterMap
-                    if (indx > 31) indx = 0
+                    if (indx > 31) {
+                        clor = '#' + Math.floor(Math.random()*16777215).toString(16);
+                    }
                     let trashSet = []
                     let charName = dataEntry.name
                     let charClass = dataEntry.className
@@ -117,6 +120,8 @@
                         data: trashSet,
                         backgroundColor: clor,
                         borderColor: clor,
+                        tension: 0.2,
+                        spanGaps: false
                     }
                     resultData.push(sortedEntry)
                 }
@@ -127,12 +132,26 @@
         function buildGraph(graphData) {
             console.log(graphData)
             if (myChart != null) myChart.destroy();
+            var chartTitle = $('#classFilter').val() + ': ' + $('#pageMetric').val()
             var ctx = document.getElementById('myChart').getContext('2d');
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets:  graphData
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'left',
+                            align: 'start',
+                            title: chartTitle,
+                            labels: {
+                                color: 'rgb(236, 236, 236)'
+                            }
+                        }
+                    }
                 }
             });
         }

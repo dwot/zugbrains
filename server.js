@@ -828,10 +828,10 @@ async function getCachedQuery(client2, query) {
   for (let cachedQuery of cachedQueries) {
     //console.log(`CachedQuery ${cachedQuery.queryString}`);
     //console.log(`CachedData ${cachedQuery.queryData}`);
-    console.log(`CachedDate ${cachedQuery.queryDate}`);
+    //console.log(`CachedDate ${cachedQuery.queryDate}`);
     let nowDate = new Date();
     cacheAge =  nowDate.getTime() - cachedQuery.queryDate.getTime();
-    console.log(`CacheAge ${(cacheAge / 1000)}s`);
+    //console.log(`CacheAge ${(cacheAge / 1000)}s`);
     if (((cacheAge / 1000) / 3600) < 6) {
       data = cachedQuery.get('queryData');
       blnFound = true;
